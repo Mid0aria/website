@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <link
+            rel="shortcut icon"
+            href="./assets/icon.png"
+            type="image/x-icon"
+        />
+        <link rel="icon" href="./assets/icon.png" type="image/x-icon" />
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>dam dam dam</title>
+        <style>
+            body {
+                font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+                margin: 0;
+                padding: 0;
+                background-color: #000000;
+                color: #ffffff;
+            }
+
+            .container {
+                max-width: 1200px;
+                margin: 20px auto;
+                padding: 0 20px;
+                position: relative;
+            }
+
+            h1 {
+                text-align: center;
+                margin-bottom: 30px;
+                color: #ffffff;
+                text-shadow: 2px 2px 3px rgba(0, 0, 0, 0.1);
+            }
+
+            .gallery {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                gap: 20px;
+            }
+
+            .video-container {
+                position: relative;
+                overflow: hidden;
+                border-radius: 10px;
+                box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+                transition: transform 0.3s ease-in-out;
+                cursor: pointer;
+            }
+
+            .video-container:hover {
+                transform: scale(1.05);
+            }
+
+            .video-container video {
+                width: 100%;
+                height: 100%;
+                border-radius: 10px;
+                display: block;
+            }
+
+            .menu {
+                text-align: center;
+                margin-bottom: 20px;
+                position: absolute;
+                top: 10px;
+                left: 20px;
+                z-index: 1000;
+            }
+
+            .menu select {
+                padding: 8px;
+                font-size: 16px;
+            }
+
+            .tiktok {
+                text-align: center;
+                margin-bottom: 20px;
+                position: absolute;
+                top: 10px;
+                right: 20px;
+                z-index: 1000;
+            }
+
+            .tiktok select {
+                padding: 8px;
+                font-size: 16px;
+            }
+            .rainbow {
+                /* Chrome, Safari, Opera */
+                -webkit-animation: rainbow 35s infinite;
+
+                /* Internet Explorer */
+                -ms-animation: rainbow 35s infinite;
+
+                /* Standar Syntax */
+                animation: rainbow 35s infinite;
+            }
+            .rainbowon {
+                display: inline-flex;
+            }
+
+            .rainbowarka {
+                display: inline-flex;
+            }
+            /* Chrome, Safari, Opera */
+            @-webkit-keyframes rainbow {
+                0% {
+                    color: orange;
+                }
+                10% {
+                    color: purple;
+                }
+                20% {
+                    color: red;
+                }
+                30% {
+                    color: CadetBlue;
+                }
+                40% {
+                    color: yellow;
+                }
+                50% {
+                    color: coral;
+                }
+                60% {
+                    color: green;
+                }
+                70% {
+                    color: cyan;
+                }
+                80% {
+                    color: DeepPink;
+                }
+                90% {
+                    color: DodgerBlue;
+                }
+                100% {
+                    color: orange;
+                }
+            }
+
+            /* Internet Explorer */
+            @-ms-keyframes rainbow {
+                0% {
+                    color: orange;
+                }
+                10% {
+                    color: purple;
+                }
+                20% {
+                    color: red;
+                }
+                30% {
+                    color: CadetBlue;
+                }
+                40% {
+                    color: yellow;
+                }
+                50% {
+                    color: coral;
+                }
+                60% {
+                    color: green;
+                }
+                70% {
+                    color: cyan;
+                }
+                80% {
+                    color: DeepPink;
+                }
+                90% {
+                    color: DodgerBlue;
+                }
+                100% {
+                    color: orange;
+                }
+            }
+
+            /* Standar Syntax */
+            @keyframes rainbow {
+                0% {
+                    color: orange;
+                }
+                10% {
+                    color: purple;
+                }
+                20% {
+                    color: red;
+                }
+                30% {
+                    color: CadetBlue;
+                }
+                40% {
+                    color: yellow;
+                }
+                50% {
+                    color: coral;
+                }
+                60% {
+                    color: green;
+                }
+                70% {
+                    color: cyan;
+                }
+                80% {
+                    color: DeepPink;
+                }
+                90% {
+                    color: DodgerBlue;
+                }
+                100% {
+                    color: orange;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1 id="desc1" class="rainbow">Bluetooth Device Ready To Pair</h1>
+            <div class="menu">
+                <select id="categorySelect">
+                    <option value="shitpost">😈 Shitpost 😈</option>
+                    <option value="car">🚗 Car 🏎️</option>
+                    <option value="songs-instrument">
+                        🎶 Songs/Instrument 🎻
+                    </option>
+                    <option value="animals">🐈 Animals 🦆</option>
+                </select>
+            </div>
+            <div id="tiktokMenu" class="tiktok" style="display: none">
+                <select id="tiktokSelect"></select>
+            </div>
+            <div class="gallery" id="videoGallery"></div>
+        </div>
+
+        <script>
+            document.addEventListener("keydown", konamiCodeCheck);
+            document.addEventListener("keydown", hmmnewcategory);
+            document.addEventListener("DOMContentLoaded", async function () {
+                const api = "https://api.github.com/repos/mid0hub/website-api";
+                const videoGallery = document.getElementById("videoGallery");
+                const categorySelect =
+                    document.getElementById("categorySelect");
+                const tiktokMenu = document.getElementById("tiktokMenu");
+                const tiktokSelect = document.getElementById("tiktokSelect");
+                let loadMoreButton = null;
+                const firstcategory = categorySelect[0].value;
+                const firstcategoryvideos = await getCachedVideos(
+                    firstcategory
+                );
+                displayVideosBatched(firstcategoryvideos);
+                //categorys
+                categorySelect.addEventListener("change", async function () {
+                    const category = categorySelect.value;
+                    console.log(category);
+
+                    videoGallery.innerHTML = "";
+                    resetLoadMoreButton();
+
+                    if (category === "tiktok") {
+                        tiktokMenu.style.display = "block";
+                        await fetchtiktok();
+                    } else {
+                        tiktokMenu.style.display = "none";
+                        const videoLinks = await getCachedVideos(category);
+                        displayVideosBatched(videoLinks);
+                    }
+                });
+
+                //tiktok
+                tiktokSelect.addEventListener("change", async function () {
+                    videoGallery.innerHTML = "";
+                    resetLoadMoreButton();
+                    const selecttiktok = tiktokSelect.value;
+                    const tiktokvideos = await getCachedVideos(
+                        `tiktok/${selecttiktok}`
+                    );
+                    displayVideosBatched(tiktokvideos);
+                });
+
+                // });
+
+                async function fetchtiktok() {
+                    const tiktoksResponse = await fetch(
+                        `${api}/contents/videos/tiktok`
+                    );
+                    const tiktoksData = await tiktoksResponse.json();
+
+                    tiktokSelect.innerHTML = "";
+
+                    tiktoksData.forEach((tiktok) => {
+                        const tiktokOption = document.createElement("option");
+                        tiktokOption.value = tiktok.name;
+                        tiktokOption.textContent = tiktok.name;
+                        tiktokSelect.appendChild(tiktokOption);
+                    });
+
+                    const firsttiktok = tiktoksData[0].name;
+                    const firsttiktokvideos = await getCachedVideos(
+                        `tiktok/${firsttiktok}`
+                    );
+                    displayVideosBatched(firsttiktokvideos);
+                }
+
+                async function displayVideosBatched(videoLinks) {
+                    const batchSize = 4;
+                    let startIndex = 0;
+
+                    function loadNextBatch() {
+                        const batch = videoLinks.slice(
+                            startIndex,
+                            startIndex + batchSize
+                        );
+                        if (batch.length > 0) {
+                            displayVideos(batch);
+                            startIndex += batchSize;
+                        } else {
+                            loadMoreButton.style.display = "none";
+                        }
+                    }
+
+                    loadNextBatch();
+
+                    loadMoreButton = document.createElement("button");
+                    loadMoreButton.textContent = "Load More";
+                    loadMoreButton.style.display = "block";
+                    loadMoreButton.style.margin = "20px auto";
+                    loadMoreButton.style.padding = "10px 20px";
+                    loadMoreButton.style.fontSize = "16px";
+                    loadMoreButton.addEventListener("click", function () {
+                        loadNextBatch();
+                    });
+                    document.body.appendChild(loadMoreButton);
+                }
+
+                async function displayVideos(videoLinks) {
+                    videoLinks.forEach((videoLink) => {
+                        const videoContainer = document.createElement("div");
+                        videoContainer.classList.add("video-container");
+
+                        const videoElement = document.createElement("video");
+                        videoElement.controls = true;
+                        videoElement.style.height = "100%";
+                        const sourceElement = document.createElement("source");
+                        sourceElement.src = videoLink;
+                        sourceElement.type = "video/mp4";
+
+                        videoElement.appendChild(sourceElement);
+                        videoContainer.appendChild(videoElement);
+
+                        videoGallery.appendChild(videoContainer);
+                    });
+                }
+                function resetLoadMoreButton() {
+                    if (loadMoreButton) {
+                        loadMoreButton.remove(); // Remove the button if exists
+                        loadMoreButton = null; // Reset button variable
+                    }
+                }
+                async function fetchAndCacheVideos(category) {
+                    const videosFolderURL =
+                        `${api}/contents/videos/` + category;
+
+                    const commitsURL = `${api}/commits`;
+                    const commitsResponse = await fetch(commitsURL);
+                    const commitsData = await commitsResponse.json();
+                    const latestCommitDate = commitsData[0].commit.author.date;
+
+                    const response = await fetch(videosFolderURL);
+                    const data = await response.json();
+
+                    const videoLinks = data.map((item) => item.download_url);
+
+                    const cachedCommitDate = localStorage.getItem(
+                        "cachedCommitDate_" + category
+                    );
+                    if (
+                        !cachedCommitDate ||
+                        cachedCommitDate !== latestCommitDate
+                    ) {
+                        localStorage.setItem(
+                            "cachedVideos_" + category,
+                            JSON.stringify(videoLinks)
+                        );
+                        localStorage.setItem(
+                            "cachedCommitDate_" + category,
+                            latestCommitDate
+                        );
+                    }
+
+                    return videoLinks;
+                }
+
+                async function getCachedVideos(category) {
+                    if (category === "tiktok") {
+                        return;
+                    }
+                    let cachedVideos = localStorage.getItem(
+                        "cachedVideos_" + category
+                    );
+
+                    if (!cachedVideos) {
+                        cachedVideos = await fetchAndCacheVideos(category);
+                    } else {
+                        const cachedCommitDate = localStorage.getItem(
+                            "cachedCommitDate_" + category
+                        );
+                        const commitsURL = `${api}/commits`;
+                        const commitsResponse = await fetch(commitsURL);
+                        const commitsData = await commitsResponse.json();
+                        const latestCommitDate =
+                            commitsData[0].commit.author.date;
+
+                        if (cachedCommitDate !== latestCommitDate) {
+                            cachedVideos = await fetchAndCacheVideos(category);
+                        } else {
+                            cachedVideos = JSON.parse(cachedVideos);
+                        }
+                    }
+
+                    return cachedVideos;
+                }
+            });
+
+            const konamiCode = [
+                "ArrowUp",
+                "ArrowUp",
+                "ArrowDown",
+                "ArrowDown",
+                "ArrowLeft",
+                "ArrowRight",
+                "ArrowLeft",
+                "ArrowRight",
+                "b",
+                "a",
+            ];
+            let konamiCodePosition = 0;
+            function konamiCodeCheck(event) {
+                if (
+                    event.key.toLowerCase() ===
+                    konamiCode[konamiCodePosition].toLowerCase()
+                ) {
+                    konamiCodePosition++;
+                    if (konamiCodePosition === konamiCode.length) {
+                        document.getElementById("desc1").innerHTML =
+                            "You Found The Secret! , again , Congratulations!";
+                        console.log("Easter Egg activated!");
+                        setTimeout(() => {
+                            window.location.href = "/fuksci.html";
+                        }, 2500);
+                        konamiCodePosition = 0;
+                    }
+                } else {
+                    konamiCodePosition = 0;
+                }
+            }
+
+            const newcategorykeys = [
+                "ArrowLeft",
+                "ArrowLeft",
+                "ArrowRight",
+                "ArrowRight",
+                "ArrowUp",
+                "ArrowUp",
+                "ArrowDown",
+                "ArrowDown",
+                "q",
+                "w",
+                "e",
+            ];
+            let newcategorykeyposition = 0;
+
+            function hmmnewcategory(event) {
+                if (
+                    event.key.toLowerCase() ===
+                    newcategorykeys[newcategorykeyposition].toLowerCase()
+                ) {
+                    newcategorykeyposition++;
+
+                    if (newcategorykeyposition === newcategorykeys.length) {
+                        console.log("Hmm new category... interesting");
+
+                        localStorage.setItem("tiktokCategory", true);
+
+                        const categorySelect =
+                            document.getElementById("categorySelect");
+
+                        const tiktokOption = categorySelect.querySelector(
+                            'option[value="tiktok"]'
+                        );
+                        if (!tiktokOption) {
+                            const newOption = document.createElement("option");
+                            newOption.value = "tiktok";
+                            newOption.textContent = "💃 tiktok 💃";
+                            categorySelect.appendChild(newOption);
+                            console.log("tiktok category added!");
+                        }
+                        newcategorykeyposition = 0;
+                    }
+                } else {
+                    newcategorykeyposition = 0;
+                }
+            }
+
+            const tiktokCategory = localStorage.getItem("tiktokCategory");
+            if (tiktokCategory !== null && tiktokCategory === "true") {
+                const categorySelect =
+                    document.getElementById("categorySelect");
+                const tiktokOption = categorySelect.querySelector(
+                    'option[value="tiktok"]'
+                );
+                if (!tiktokOption) {
+                    const newOption = document.createElement("option");
+                    newOption.value = "tiktok";
+                    newOption.textContent = "💃 tiktok 💃";
+                    categorySelect.appendChild(newOption);
+                    console.log("tiktok category added!");
+                }
+            }
+
+            document.addEventListener("keydown", hmmnewcategory);
+        </script>
+    </body>
+</html>
