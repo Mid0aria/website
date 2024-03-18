@@ -11,6 +11,21 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>dam dam dam</title>
         <style>
+            .like-button {
+                position: absolute;
+                bottom: 10px; /* Adjust the bottom distance as needed */
+                right: 10px; /* Adjust the right distance as needed */
+                padding: 5px 10px;
+                background-color: #ffffff;
+                color: #000000;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+            }
+
+            .like-button:hover {
+                background-color: #dddddd;
+            }
             body {
                 font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
                 margin: 0;
@@ -226,6 +241,7 @@
                         🎶 Songs/Instrument 🎻
                     </option>
                     <option value="animals">🐈 Animals 🦆</option>
+                    <option value="liked">❤️ Liked ❤️</option>
                 </select>
             </div>
             <div id="tiktokMenu" class="tiktok" style="display: none">
@@ -258,14 +274,38 @@
                     resetLoadMoreButton();
 
                     if (category === "tiktok") {
+                        switchFromLikedCategory();
                         tiktokMenu.style.display = "block";
                         await fetchtiktok();
+                    } else if (category === "liked") {
+                        switchToLikedCategory();
+                        tiktokMenu.style.display = "none";
+                        const videoLinks = await getCachedVideos(category);
+                        displayVideosBatched(videoLinks);
                     } else {
+                        switchFromLikedCategory();
                         tiktokMenu.style.display = "none";
                         const videoLinks = await getCachedVideos(category);
                         displayVideosBatched(videoLinks);
                     }
                 });
+                // Function to switch to the liked category and update the container id
+                function switchToLikedCategory() {
+                    const container = document.getElementById("videoGallery");
+                    if (container) {
+                        container.id = "liked_category";
+                        console.log("Switched to liked category.");
+                    }
+                }
+
+                // Function to switch back from the liked category and revert the container id
+                function switchFromLikedCategory() {
+                    const container = document.getElementById("liked_category");
+                    if (container) {
+                        container.id = "videoGallery";
+                        console.log("Switched from liked category.");
+                    }
+                }
 
                 //tiktok
                 tiktokSelect.addEventListener("change", async function () {
@@ -354,7 +394,6 @@
                 async function displayVideosBatched(videoLinks) {
                     const batchSize = 4;
                     let startIndex = 0;
-
                     function loadNextBatch() {
                         const batch = videoLinks.slice(
                             startIndex,
@@ -382,7 +421,13 @@
                     document.body.appendChild(loadMoreButton);
                 }
 
+                // Display videos with like/unlike buttons
                 async function displayVideos(videoLinks) {
+                    console.log(videoLinks);
+                    const likedVideos =
+                        localStorage.getItem("liked_videos") || "[]";
+                    const parsedLikedVideos = JSON.parse(likedVideos);
+
                     videoLinks.forEach((videoLink) => {
                         const videoContainer = document.createElement("div");
                         videoContainer.classList.add("video-container");
@@ -394,11 +439,83 @@
                         sourceElement.src = videoLink;
                         sourceElement.type = "video/mp4";
 
+                        // Check if the video is liked
+                        const isLiked = parsedLikedVideos.includes(videoLink);
+
+                        if (isLiked) {
+                            videoElement.setAttribute("data-liked", "true");
+                        }
+
                         videoElement.appendChild(sourceElement);
                         videoContainer.appendChild(videoElement);
 
+                        // Create like/unlike button
+                        const likeButton = document.createElement("button");
+                        likeButton.textContent = isLiked ? "❤️" : "🤍";
+                        likeButton.classList.add("like-button");
+
+                        likeButton.addEventListener("click", function () {
+                            toggleLikeStatus(
+                                videoLink,
+                                videoElement,
+                                likeButton
+                            );
+                        });
+
+                        videoContainer.appendChild(likeButton);
+
                         videoGallery.appendChild(videoContainer);
                     });
+                }
+
+                // Toggle like status when like button is clicked
+                // Toggle like status when like button is clicked
+                function toggleLikeStatus(videoLink, videoElement, likeButton) {
+                    const likedVideos =
+                        JSON.parse(localStorage.getItem("liked_videos")) || [];
+                    const isLiked = likedVideos.includes(videoLink);
+
+                    if (!isLiked) {
+                        // Add like
+                        likedVideos.push(videoLink);
+                        localStorage.setItem(
+                            "liked_videos",
+                            JSON.stringify(likedVideos)
+                        );
+                        likeButton.textContent = "❤️"; // Change button text
+                        videoElement.setAttribute("data-liked", "true"); // Update data attribute
+                        console.log("Video liked");
+                    } else {
+                        // Remove like
+                        const updatedLikes = likedVideos.filter(
+                            (link) => link !== videoLink
+                        );
+                        localStorage.setItem(
+                            "liked_videos",
+                            JSON.stringify(updatedLikes)
+                        );
+                        likeButton.textContent = "🤍"; // Change button text
+                        videoElement.removeAttribute("data-liked"); // Update data attribute
+                        console.log("Video unliked");
+
+                        // Remove video from the liked category
+                        const likedCategory =
+                            document.getElementById("liked_category");
+                        if (likedCategory) {
+                            const videoContainers =
+                                likedCategory.querySelectorAll(
+                                    ".video-container"
+                                );
+                            videoContainers.forEach((container) => {
+                                if (
+                                    container.querySelector("source").src ===
+                                    videoLink
+                                ) {
+                                    container.remove();
+                                }
+                            });
+                        }
+                    }
                 }
 
                 function resetLoadMoreButton() {
@@ -409,6 +526,9 @@
                 }
 
                 async function fetchAndCacheVideos(category) {
+                    if (category == "liked") {
+                        return JSON.parse(localStorage.getItem("liked_videos"));
+                    }
                     const videosFolderURL =
                         `${api}/contents/videos/` + category;
 
