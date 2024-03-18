@@ -423,7 +423,6 @@
 
                 // Display videos with like/unlike buttons
                 async function displayVideos(videoLinks) {
-                    console.log(videoLinks);
                     const likedVideos =
                         localStorage.getItem("liked_videos") || "[]";
                     const parsedLikedVideos = JSON.parse(likedVideos);
@@ -484,7 +483,6 @@
                         );
                         likeButton.textContent = "❤️"; // Change button text
                         videoElement.setAttribute("data-liked", "true"); // Update data attribute
-                        console.log("Video liked");
                     } else {
                         // Remove like
                         const updatedLikes = likedVideos.filter(
@@ -496,7 +494,6 @@
                         );
                         likeButton.textContent = "🤍"; // Change button text
                         videoElement.removeAttribute("data-liked"); // Update data attribute
-                        console.log("Video unliked");
 
                         // Remove video from the liked category
                         const likedCategory =
@@ -563,7 +560,7 @@
                 }
 
                 async function getCachedVideos(category) {
-                    if (category === "tiktok") {
+                    if (category === "tiktok" || category === "liked") {
                         return;
                     }
                     if (category.includes("tiktok/")) {
