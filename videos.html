@@ -253,7 +253,6 @@
                 //categorys
                 categorySelect.addEventListener("change", async function () {
                     const category = categorySelect.value;
-                    console.log(category);
 
                     videoGallery.innerHTML = "";
                     resetLoadMoreButton();
@@ -285,22 +284,71 @@
                     const tiktoksResponse = await fetch(
                         `${api}/contents/videos/tiktok`
                     );
+
                     const tiktoksData = await tiktoksResponse.json();
+
+                    const cachedTiktokers =
+                        localStorage.getItem("cachedtiktokers");
+
+                    if (!cachedTiktokers) {
+                        console.log(`Tiktokers is caching...`);
+                        localStorage.setItem(
+                            "cachedtiktokers",
+                            JSON.stringify(tiktoksData)
+                        );
+                    } else {
+                        const cachedCommitDate = localStorage.getItem(
+                            "cachedCommitDate_tiktok"
+                        );
+                        const commitsURL = `${api}/commits`;
+                        const commitsResponse = await fetch(commitsURL);
+
+                        if (commitsResponse.ok) {
+                            const commitsData = await commitsResponse.json();
+                            const latestCommitDate =
+                                commitsData[0].commit.author.date;
+
+                            if (cachedCommitDate !== latestCommitDate) {
+                                console.log("YEEEYYY New TikTokerssss");
+                                localStorage.setItem(
+                                    "cachedtiktokers",
+                                    JSON.stringify(tiktoksData)
+                                );
+                                localStorage.setItem(
+                                    "cachedCommitDate_tiktok",
+                                    latestCommitDate
+                                );
+                            } else {
+                                console.log(
+                                    `Tiktokers:\ncachedCommitDate: ${cachedCommitDate}\nlatestCommitDate: ${latestCommitDate}`
+                                );
+                            }
+                        } else {
+                            console.log(
+                                `You Forbidden Github Api\nReason: github rate limit activated please try again after 1 hour\nResponse:`
+                            );
+                            console.log(commitsResponse);
+                        }
+                    }
+
+                    const updatedCachedTiktokers =
+                        localStorage.getItem("cachedtiktokers");
+                    const tiktokers = JSON.parse(updatedCachedTiktokers);
 
                     tiktokSelect.innerHTML = "";
 
-                    tiktoksData.forEach((tiktok) => {
+                    tiktokers.forEach((tiktoker) => {
                         const tiktokOption = document.createElement("option");
-                        tiktokOption.value = tiktok.name;
-                        tiktokOption.textContent = tiktok.name;
+                        tiktokOption.value = tiktoker.name;
+                        tiktokOption.textContent = tiktoker.name;
                         tiktokSelect.appendChild(tiktokOption);
                     });
 
-                    const firsttiktok = tiktoksData[0].name;
-                    const firsttiktokvideos = await getCachedVideos(
-                        `tiktok/${firsttiktok}`
+                    const firstTiktok = tiktokers[0].name;
+                    const firstTiktokVideos = await getCachedVideos(
+                        `tiktok/${firstTiktok}`
                     );
-                    displayVideosBatched(firsttiktokvideos);
+                    displayVideosBatched(firstTiktokVideos);
                 }
 
                 async function displayVideosBatched(videoLinks) {
@@ -352,12 +400,14 @@
                         videoGallery.appendChild(videoContainer);
                     });
                 }
+
                 function resetLoadMoreButton() {
                     if (loadMoreButton) {
                         loadMoreButton.remove(); // Remove the button if exists
                         loadMoreButton = null; // Reset button variable
                     }
                 }
+
                 async function fetchAndCacheVideos(category) {
                     const videosFolderURL =
                         `${api}/contents/videos/` + category;
@@ -396,11 +446,57 @@
                     if (category === "tiktok") {
                         return;
                     }
+                    if (category.includes("tiktok/")) {
+                        let cachedVideos = localStorage.getItem(
+                            "cachedVideos_" + category
+                        );
+
+                        if (!cachedVideos) {
+                            console.log(`${category} is caching...`);
+                            cachedVideos = await fetchAndCacheVideos(category);
+                        } else {
+                            const cachedCommitDate = localStorage.getItem(
+                                "cachedCommitDate_" + category
+                            );
+                            const commitsURL = `${api}/commits`;
+                            const commitsResponse = await fetch(commitsURL);
+
+                            if (commitsResponse.status === 403) {
+                                console.log(
+                                    `You Forbidden Github Api\nReason: github rate limit activated please try again after 1 hour\nResponse:`
+                                );
+                                console.log(commitsResponse);
+                                cachedVideos = JSON.parse(cachedVideos);
+                                cachedVideos.reverse();
+                            } else {
+                                const commitsData =
+                                    await commitsResponse.json();
+                                const latestCommitDate =
+                                    commitsData[0].commit.author.date;
+
+                                if (cachedCommitDate !== latestCommitDate) {
+                                    console.log("YEEEYYY New Videossss");
+                                    cachedVideos = await fetchAndCacheVideos(
+                                        category
+                                    );
+                                } else {
+                                    console.log(
+                                        `Category: ${category}\ncachedCommitDate: ${cachedCommitDate}\nlatestCommitDate: ${latestCommitDate}`
+                                    );
+                                    cachedVideos = JSON.parse(cachedVideos);
+                                }
+                            }
+                        }
+                        cachedVideos.reverse();
+
+                        return cachedVideos;
+                    }
                     let cachedVideos = localStorage.getItem(
                         "cachedVideos_" + category
                     );
 
                     if (!cachedVideos) {
+                        console.log(`${category} is caching...`);
                         cachedVideos = await fetchAndCacheVideos(category);
                     } else {
                         const cachedCommitDate = localStorage.getItem(
@@ -408,14 +504,29 @@
                         );
                         const commitsURL = `${api}/commits`;
                         const commitsResponse = await fetch(commitsURL);
-                        const commitsData = await commitsResponse.json();
-                        const latestCommitDate =
-                            commitsData[0].commit.author.date;
 
-                        if (cachedCommitDate !== latestCommitDate) {
-                            cachedVideos = await fetchAndCacheVideos(category);
-                        } else {
+                        if (commitsResponse.status === 403) {
+                            console.log(
+                                `You Forbidden Github Api\nReason: github rate limit activated please try again after 1 hour\nResponse:`
+                            );
+                            console.log(commitsResponse);
                             cachedVideos = JSON.parse(cachedVideos);
+                        } else {
+                            const commitsData = await commitsResponse.json();
+                            const latestCommitDate =
+                                commitsData[0].commit.author.date;
+
+                            if (cachedCommitDate !== latestCommitDate) {
+                                console.log("YEEEYYY New Videossss");
+                                cachedVideos = await fetchAndCacheVideos(
+                                    category
+                                );
+                            } else {
+                                console.log(
+                                    `Category: ${category}\ncachedCommitDate: ${cachedCommitDate}\nlatestCommitDate: ${latestCommitDate}`
+                                );
+                                cachedVideos = JSON.parse(cachedVideos);
+                            }
                         }
                     }
 
