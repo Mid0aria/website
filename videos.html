@@ -422,7 +422,7 @@
                 }
 
                 async function displayVideosBatched(videoLinks) {
-                    if (videoLinks.length < 0) {
+                    if (!videoLinks) {
                         return;
                     }
                     const batchSize = 4;
