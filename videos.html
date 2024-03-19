@@ -280,58 +280,33 @@
                     videoGallery.innerHTML = "";
                     resetLoadMoreButton();
                     if (category === "tiktok") {
-                        switchFromLikedCategory();
-                        switchFromsavedCategory();
+                        switchCategory("videoGallery");
                         tiktokMenu.style.display = "block";
                         await fetchtiktok();
                     } else if (category === "liked") {
-                        switchToLikedCategory();
+                        switchCategory("liked_category");
                         tiktokMenu.style.display = "none";
                         const videoLinks = await getCachedVideos(category);
                         displayVideosBatched(videoLinks);
                     } else if (category === "saved") {
-                        switchTosavedCategory();
+                        switchCategory("saved_category");
                         tiktokMenu.style.display = "none";
                         const videoLinks = await getCachedVideos(category);
                         displayVideosBatched(videoLinks);
                     } else {
-                        switchFromLikedCategory();
-                        switchFromsavedCategory();
+                        switchCategory("videoGallery");
                         tiktokMenu.style.display = "none";
                         const videoLinks = await getCachedVideos(category);
                         displayVideosBatched(videoLinks);
                     }
                 });
-                //TODO: aio function for category switcher
 
-                function switchToLikedCategory() {
-                    const container = document.getElementById("videoGallery");
+                function switchCategory(a) {
+                    const container = document.querySelector(".gallery");
+                    console.log(container);
                     if (container) {
-                        container.id = "liked_category";
-                        console.log("Switched to liked category.");
-                    }
-                }
-
-                function switchFromLikedCategory() {
-                    const container = document.getElementById("liked_category");
-                    if (container) {
-                        container.id = "videoGallery";
-                        console.log("Switched from liked category.");
-                    }
-                }
-                function switchTosavedCategory() {
-                    const container = document.getElementById("videoGallery");
-                    if (container) {
-                        container.id = "saved_category";
-                        console.log("Switched to saved category.");
-                    }
-                }
-
-                function switchFromsavedCategory() {
-                    const container = document.getElementById("saved_category");
-                    if (container) {
-                        container.id = "videoGallery";
-                        console.log("Switched from saved category.");
+                        container.id = a;
+                        console.log(`Switched to ${a}.`);
                     }
                 }
 
