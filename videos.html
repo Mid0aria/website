@@ -21,6 +21,16 @@
                 border-radius: 5px;
                 cursor: pointer;
             }
+            .saved-button {
+                position: absolute;
+                bottom: 480px;
+                right: 50px;
+                padding: 5px 10px;
+                background-color: #ffffff;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+            }
 
             body {
                 font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
@@ -228,16 +238,19 @@
     </head>
     <body>
         <div class="container">
-            <h1 id="desc1" class="rainbow">Bluetooth Device Ready To Pair</h1>
+            <h1 id="desc1" class="rainbow">ε(´｡•᎑•`)っ 💕</h1>
             <div class="menu">
                 <select id="categorySelect">
+                    <option value="liked">❤️ Liked ❤️</option>
+                    <option value="saved">💾 Saved 💾</option>
                     <option value="shitpost">😈 Shitpost 😈</option>
                     <option value="car">🚗 Car 🏎️</option>
                     <option value="songs-instrument">
                         🎶 Songs/Instrument 🎻
                     </option>
                     <option value="animals">🐈 Animals 🦆</option>
-                    <option value="liked">❤️ Liked ❤️</option>
+
+                    ε(´｡•᎑•`)っ 💕
                 </select>
             </div>
             <div id="tiktokMenu" class="tiktok" style="display: none">
@@ -268,9 +281,9 @@
 
                     videoGallery.innerHTML = "";
                     resetLoadMoreButton();
-
                     if (category === "tiktok") {
                         switchFromLikedCategory();
+                        switchFromsavedCategory();
                         tiktokMenu.style.display = "block";
                         await fetchtiktok();
                     } else if (category === "liked") {
@@ -278,14 +291,21 @@
                         tiktokMenu.style.display = "none";
                         const videoLinks = await getCachedVideos(category);
                         displayVideosBatched(videoLinks);
+                    } else if (category === "saved") {
+                        switchTosavedCategory();
+                        tiktokMenu.style.display = "none";
+                        const videoLinks = await getCachedVideos(category);
+                        displayVideosBatched(videoLinks);
                     } else {
                         switchFromLikedCategory();
+                        switchFromsavedCategory();
                         tiktokMenu.style.display = "none";
                         const videoLinks = await getCachedVideos(category);
                         displayVideosBatched(videoLinks);
                     }
                 });
-                // Function to switch to the liked category and update the container id
+                //TODO: aio function for category switcher
+
                 function switchToLikedCategory() {
                     const container = document.getElementById("videoGallery");
                     if (container) {
@@ -294,12 +314,26 @@
                     }
                 }
 
-                // Function to switch back from the liked category and revert the container id
                 function switchFromLikedCategory() {
                     const container = document.getElementById("liked_category");
                     if (container) {
                         container.id = "videoGallery";
                         console.log("Switched from liked category.");
+                    }
+                }
+                function switchTosavedCategory() {
+                    const container = document.getElementById("videoGallery");
+                    if (container) {
+                        container.id = "saved_category";
+                        console.log("Switched to saved category.");
+                    }
+                }
+
+                function switchFromsavedCategory() {
+                    const container = document.getElementById("saved_category");
+                    if (container) {
+                        container.id = "videoGallery";
+                        console.log("Switched from saved category.");
                     }
                 }
 
@@ -422,6 +456,9 @@
                     const likedVideos =
                         localStorage.getItem("liked_videos") || "[]";
                     const parsedLikedVideos = JSON.parse(likedVideos);
+                    const savedVideos =
+                        localStorage.getItem("saved_videos") || "[]";
+                    const parsedsavedVideos = JSON.parse(savedVideos);
 
                     videoLinks.forEach((videoLink) => {
                         const videoContainer = document.createElement("div");
@@ -441,6 +478,13 @@
                             videoElement.setAttribute("data-liked", "true");
                         }
 
+                        // Check if the video is saved
+                        const issaved = parsedsavedVideos.includes(videoLink);
+
+                        if (issaved) {
+                            videoElement.setAttribute("data-saved", "true");
+                        }
+
                         videoElement.appendChild(sourceElement);
                         videoContainer.appendChild(videoElement);
 
@@ -458,13 +502,25 @@
                         });
 
                         videoContainer.appendChild(likeButton);
+                        // Create saved button
+                        const savedButton = document.createElement("button");
+                        savedButton.textContent = issaved ? "📀" : "💿";
+                        savedButton.classList.add("saved-button");
+
+                        savedButton.addEventListener("click", function () {
+                            toggleSavedStatus(
+                                videoLink,
+                                videoElement,
+                                savedButton
+                            );
+                        });
+
+                        videoContainer.appendChild(savedButton);
 
                         videoGallery.appendChild(videoContainer);
                     });
                 }
 
-                // Toggle like status when like button is clicked
-                // Toggle like status when like button is clicked
                 function toggleLikeStatus(videoLink, videoElement, likeButton) {
                     const likedVideos =
                         JSON.parse(localStorage.getItem("liked_videos")) || [];
@@ -511,6 +567,56 @@
                     }
                 }
 
+                function toggleSavedStatus(
+                    videoLink,
+                    videoElement,
+                    savedButton
+                ) {
+                    const savedVideos =
+                        JSON.parse(localStorage.getItem("saved_videos")) || [];
+                    const issaved = savedVideos.includes(videoLink);
+
+                    if (!issaved) {
+                        // Add saved
+                        savedVideos.push(videoLink);
+                        localStorage.setItem(
+                            "saved_videos",
+                            JSON.stringify(savedVideos)
+                        );
+                        savedButton.textContent = "📀"; // Change button text
+                        videoElement.setAttribute("data-saved", "true"); // Update data attribute
+                    } else {
+                        // Remove saved
+                        const updatedsaveds = savedVideos.filter(
+                            (link) => link !== videoLink
+                        );
+                        localStorage.setItem(
+                            "saved_videos",
+                            JSON.stringify(updatedsaveds)
+                        );
+                        savedButton.textContent = "💿"; // Change button text
+                        videoElement.removeAttribute("data-saved"); // Update data attribute
+
+                        // Remove video from the saved category
+                        const savedCategory =
+                            document.getElementById("saved_category");
+                        if (savedCategory) {
+                            const videoContainers =
+                                savedCategory.querySelectorAll(
+                                    ".video-container"
+                                );
+                            videoContainers.forEach((container) => {
+                                if (
+                                    container.querySelector("source").src ===
+                                    videoLink
+                                ) {
+                                    container.remove();
+                                }
+                            });
+                        }
+                    }
+                }
+
                 function resetLoadMoreButton() {
                     if (loadMoreButton) {
                         loadMoreButton.remove(); // Remove the button if exists
@@ -521,6 +627,9 @@
                 async function fetchAndCacheVideos(category) {
                     if (category == "liked") {
                         return JSON.parse(localStorage.getItem("liked_videos"));
+                    }
+                    if (category == "saved") {
+                        return JSON.parse(localStorage.getItem("saved_videos"));
                     }
                     const videosFolderURL =
                         `${api}/contents/videos/` + category;
