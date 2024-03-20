@@ -17,27 +17,28 @@ document.addEventListener("DOMContentLoaded", async function () {
         videoGallery.innerHTML = "";
 
         if (category === "tiktok") {
-            resetLoadMoreButton();
             switchCategory("videoGallery");
             tiktokMenu.style.display = "block";
+            resetLoadMoreButton();
             await fetchtiktok();
         } else if (category === "liked") {
-            resetLoadMoreButton();
             switchCategory("liked_category");
             tiktokMenu.style.display = "none";
             const videoLinks = await getCachedVideos(category);
+            resetLoadMoreButton();
+
             displayVideosBatched(videoLinks);
         } else if (category === "saved") {
-            resetLoadMoreButton();
             switchCategory("saved_category");
             tiktokMenu.style.display = "none";
             const videoLinks = await getCachedVideos(category);
+            resetLoadMoreButton();
             displayVideosBatched(videoLinks);
         } else {
-            resetLoadMoreButton();
             switchCategory("videoGallery");
             tiktokMenu.style.display = "none";
             const videoLinks = await getCachedVideos(category);
+            resetLoadMoreButton();
             displayVideosBatched(videoLinks);
         }
     });
@@ -53,9 +54,9 @@ document.addEventListener("DOMContentLoaded", async function () {
     //tiktok
     tiktokSelect.addEventListener("change", async function () {
         videoGallery.innerHTML = "";
-        resetLoadMoreButton();
         const selecttiktok = tiktokSelect.value;
         const tiktokvideos = await getCachedVideos(`tiktok/${selecttiktok}`);
+        resetLoadMoreButton();
         displayVideosBatched(tiktokvideos);
     });
 
@@ -290,25 +291,22 @@ document.addEventListener("DOMContentLoaded", async function () {
     async function fetchAndCacheVideos(category) {
         if (category == "liked") {
             return JSON.parse(localStorage.getItem("liked_videos"));
-        }
-        if (category == "saved") {
+        } else if (category == "saved") {
             return JSON.parse(localStorage.getItem("saved_videos"));
         }
-        const videosFolderURL = `${api}/contents/videos/` + category;
 
+        const videosFolderURL = `${api}/contents/videos/` + category;
         const commitsURL = `${api}/commits`;
         const commitsResponse = await fetch(commitsURL);
         const commitsData = await commitsResponse.json();
         const latestCommitDate = commitsData[0].commit.author.date;
-
         const response = await fetch(videosFolderURL);
         const data = await response.json();
-
         const videoLinks = data.map((item) => item.download_url);
-
         const cachedCommitDate = localStorage.getItem(
             "cachedCommitDate_" + category
         );
+
         if (!cachedCommitDate || cachedCommitDate !== latestCommitDate) {
             localStorage.setItem(
                 "cachedVideos_" + category,
