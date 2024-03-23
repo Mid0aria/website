@@ -28,6 +28,11 @@
     </head>
     <body>
         <div class="container">
+            <div class="settings-menu">
+                <button id="settingsButton">
+                    <i class="bi bi-gear"></i>
+                </button>
+            </div>
             <h1 id="desc1" class="rainbow">ε(´｡•᎑•`)っ 💕</h1>
             <div class="menu">
                 <select id="categorySelect">
@@ -45,6 +50,25 @@
                 <select id="tiktokSelect"></select>
             </div>
             <div class="gallery" id="videoGallery"></div>
+            <!-- Modal -->
+            <div id="settingsModal" class="settingsmodal">
+                <span class="settingsmodalclose-btn" onclick="closeModal()">
+                    <i class="bi bi-x-circle"></i>
+                </span>
+                <div class="settingsmodal-content">
+                    <h2>Settings</h2>
+                    <h3>Ambiance</h3>
+                    <div class="switch">
+                        <label for="ambianceToggleSwitch">Ambiance Mode:</label>
+                        <input type="checkbox" id="ambianceToggleSwitch" />
+                    </div>
+
+                    <h3>Title</h3>
+                    <label for="newTitle">Title:</label>
+                    <input type="text" id="newTitle" />
+                    <button id="resettitle">Reset Title</button>
+                </div>
+            </div>
         </div>
 
         <script src="./js/e.js"></script>

@@ -1,6 +1,7 @@
 document.addEventListener("keydown", konamiCodeCheck);
 document.addEventListener("keydown", hmmnewcategory);
 document.addEventListener("DOMContentLoaded", async function () {
+    checktitle();
     const api = "https://api.github.com/repos/mid0hub/website-api";
     const videoGallery = document.getElementById("videoGallery");
     const categorySelect = document.getElementById("categorySelect");
@@ -216,6 +217,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             videoContainer.appendChild(savedButton);
 
             videoGallery.appendChild(videoContainer);
+            checkambiance();
         });
     }
 
@@ -401,6 +403,76 @@ document.addEventListener("DOMContentLoaded", async function () {
         return cachedVideos;
     }
 });
+
+/*
+==========================
+		Settings
+==========================
+*/
+const settingsButton = document.getElementById("settingsButton");
+const settingsModal = document.getElementById("settingsModal");
+const ambianceToggleSwitch = document.getElementById("ambianceToggleSwitch");
+const changeTitleInput = document.getElementById("newTitle");
+const resetTitleButton = document.getElementById("resettitle");
+const desc1 = document.getElementById("desc1");
+function checkambiance() {
+    const isAmbianceMode = localStorage.getItem("ambianceMode");
+    if (isAmbianceMode && isAmbianceMode === "true") {
+        ambianceToggleSwitch.checked = true;
+        document
+            .querySelectorAll(".video-container")
+            .forEach(function (videoContainer) {
+                videoContainer.style.boxShadow = "0 0 20px rgb(255, 255, 255)";
+            });
+    }
+}
+
+function checktitle() {
+    const title = localStorage.getItem("title");
+    if (title) {
+        if (title.trim() === "") {
+            desc1.textContent = "ε(´｡•᎑•`)っ 💕";
+            localStorage.setItem("title", desc1.textContent);
+        } else {
+            desc1.textContent = title;
+        }
+    }
+}
+
+ambianceToggleSwitch.addEventListener("change", function () {
+    if (ambianceToggleSwitch.checked) {
+        document
+            .querySelectorAll(".video-container")
+            .forEach(function (videoContainer) {
+                videoContainer.style.boxShadow = "0 0 20px rgb(255, 255, 255)";
+            });
+        localStorage.setItem("ambianceMode", "true");
+    } else {
+        document
+            .querySelectorAll(".video-container")
+            .forEach(function (videoContainer) {
+                videoContainer.style.boxShadow = "0 0 20px rgb(0, 0, 0)";
+            });
+        localStorage.setItem("ambianceMode", "false");
+    }
+});
+
+changeTitleInput.addEventListener("input", function () {
+    desc1.textContent = changeTitleInput.value;
+    localStorage.setItem("title", desc1.textContent);
+});
+resetTitleButton.addEventListener("click", function () {
+    desc1.textContent = "ε(´｡•᎑•`)っ 💕";
+    localStorage.setItem("title", desc1.textContent);
+});
+
+settingsButton.addEventListener("click", function () {
+    settingsModal.style.display = "block";
+});
+
+function closeModal() {
+    settingsModal.style.display = "none";
+}
 
 /*
 ==========================
