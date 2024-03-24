@@ -9,9 +9,9 @@ document.addEventListener("DOMContentLoaded", async function () {
     const tiktokSelect = document.getElementById("tiktokSelect");
     const instagramMenu = document.getElementById("instagramMenu");
     let loadMoreButton = null;
-    const firstcategory = categorySelect[0].value;
-    const firstcategoryvideos = await getCachedVideos(firstcategory);
-    displayVideosBatched(firstcategoryvideos);
+    let firstcategory = categorySelect[0].value;
+    let firstcategorymedia = await getCachedMedia(firstcategory);
+    displayMediaBatched(firstcategorymedia);
     categorySelect.addEventListener("change", async function () {
         const category = categorySelect.value;
 
@@ -33,23 +33,23 @@ document.addEventListener("DOMContentLoaded", async function () {
             switchCategory("liked_category");
             tiktokMenu.style.display = "none";
             instagramMenu.style.display = "none";
-            const videoLinks = await getCachedVideos(category);
+            const mediaLinks = await getCachedMedia(category);
             resetLoadMoreButton();
-            displayVideosBatched(videoLinks);
+            displayMediaBatched(mediaLinks);
         } else if (category === "saved") {
             switchCategory("saved_category");
             tiktokMenu.style.display = "none";
             instagramMenu.style.display = "none";
-            const videoLinks = await getCachedVideos(category);
+            const mediaLinks = await getCachedMedia(category);
             resetLoadMoreButton();
-            displayVideosBatched(videoLinks);
+            displayMediaBatched(mediaLinks);
         } else {
             switchCategory("Gallery");
             tiktokMenu.style.display = "none";
             instagramMenu.style.display = "none";
-            const videoLinks = await getCachedVideos(category);
+            const mediaLinks = await getCachedMedia(category);
             resetLoadMoreButton();
-            displayVideosBatched(videoLinks);
+            displayMediaBatched(mediaLinks);
         }
     });
 
@@ -64,21 +64,20 @@ document.addEventListener("DOMContentLoaded", async function () {
     tiktokSelect.addEventListener("change", async function () {
         Gallery.innerHTML = "";
         const selecttiktok = tiktokSelect.value;
-        const tiktokvideos = await getCachedVideos(`tiktok/${selecttiktok}`);
+        const tiktokmedia = await getCachedMedia(`tiktok/${selecttiktok}`);
         resetLoadMoreButton();
-        displayVideosBatched(tiktokvideos);
+        displayMediaBatched(tiktokmedia);
     });
 
-    //instagram
     instagramSelect.addEventListener("change", async function () {
         Gallery.innerHTML = "";
         selectInstagram = instagramSelect.value;
-        const instagramVideos = await getCachedVideos(
+        const instagramMedia = await getCachedMedia(
             `instagram/${selectInstagram}`
         );
 
         resetLoadMoreButton();
-        displayVideosBatched(instagramVideos);
+        displayMediaBatched(instagramMedia);
     });
 
     // /*});*/ //That interesting
@@ -154,10 +153,8 @@ document.addEventListener("DOMContentLoaded", async function () {
         });
 
         const firstTiktok = tiktokers[0].name;
-        const firstTiktokVideos = await getCachedVideos(
-            `tiktok/${firstTiktok}`
-        );
-        displayVideosBatched(firstTiktokVideos);
+        const firsttiktokmedia = await getCachedMedia(`tiktok/${firstTiktok}`);
+        displayMediaBatched(firsttiktokmedia);
     }
 
     async function fetchInstagram() {
@@ -235,20 +232,26 @@ document.addEventListener("DOMContentLoaded", async function () {
         });
 
         const firstInstagram = instagrammers[0].name;
-        let cachedInstagramerImages = await getCachedVideos(
+        let cachedInstagramerImages = await getCachedMedia(
             `instagram/${firstInstagram}`
         );
-        displayVideosBatched(cachedInstagramerImages);
+        displayMediaBatched(cachedInstagramerImages);
     }
 
-    async function displayVideosBatched(videoLinks) {
-        if (!videoLinks) {
+    /*
+==========================
+	Display Media
+==========================
+*/
+
+    async function displayMediaBatched(mediaLinks) {
+        if (!mediaLinks) {
             return;
         }
         const batchSize = 4;
         let startIndex = 0;
         function loadNextBatch() {
-            const batch = videoLinks.slice(startIndex, startIndex + batchSize);
+            const batch = mediaLinks.slice(startIndex, startIndex + batchSize);
             if (batch.length > 0) {
                 displayMedia(batch);
                 startIndex += batchSize;
@@ -272,6 +275,13 @@ document.addEventListener("DOMContentLoaded", async function () {
         document.body.appendChild(loadMoreButton);
     }
 
+    function resetLoadMoreButton() {
+        if (loadMoreButton) {
+            loadMoreButton.remove();
+            loadMoreButton = null;
+        }
+    }
+
     async function displayMedia(mediaLinks) {
         const liked = localStorage.getItem("liked") || "[]";
         const parsedLiked = JSON.parse(liked);
@@ -284,7 +294,6 @@ document.addEventListener("DOMContentLoaded", async function () {
 
             let mediaElement;
             if (mediaLink.endsWith(".mp4")) {
-                // Video formatına uygun şekilde gösterim
                 mediaElement = document.createElement("video");
                 mediaElement.controls = true;
             } else if (
@@ -292,15 +301,13 @@ document.addEventListener("DOMContentLoaded", async function () {
                 mediaLink.endsWith(".jpg") ||
                 mediaLink.endsWith(".webp")
             ) {
-                // Resim formatına uygun şekilde gösterim
                 mediaElement = document.createElement("img");
                 mediaElement.addEventListener("click", () => {
-                    openPopup(mediaLink); // Resme tıklandığında popup aç
+                    openPopup(mediaLink);
                 });
             } else {
-                // Diğer durumlar için uygun işlem
                 console.error("Unsupported media format:", mediaLink);
-                return; // Sonraki adıma geçmeden fonksiyondan çık
+                return;
             }
 
             mediaElement.src = mediaLink;
@@ -345,7 +352,24 @@ document.addEventListener("DOMContentLoaded", async function () {
         });
     }
 
+    /*
+==========================
+	POPUP
+==========================
+*/
+
+    document.addEventListener("click", function (event) {
+        const popup = document.querySelector(".popup-container");
+        if (popup && !popup.contains(event.target)) {
+            popup.remove();
+        }
+    });
+
     function openPopup(imageUrl) {
+        const existingPopup = document.querySelector(".popup-container");
+        if (existingPopup) {
+            existingPopup.remove();
+        }
         const popupContainer = document.createElement("div");
         popupContainer.classList.add("popup-container");
 
@@ -377,28 +401,37 @@ document.addEventListener("DOMContentLoaded", async function () {
         popupContainer.style.display = "none";
         document.body.removeChild(popupContainer);
     }
-
-    function toggleLikeStatus(videoLink, videoElement, likeButton) {
+    /*
+==========================
+	toggle Status
+==========================
+*/
+    function toggleLikeStatus(mediaLink, mediaElement, likeButton) {
         const liked = JSON.parse(localStorage.getItem("liked")) || [];
-        const isLiked = liked.includes(videoLink);
+        const isLiked = liked.includes(mediaLink);
 
         if (!isLiked) {
-            liked.push(videoLink);
+            liked.push(mediaLink);
             localStorage.setItem("liked", JSON.stringify(liked));
             likeButton.innerHTML = '<i class="bi bi-suit-heart-fill"></i>';
-            videoElement.setAttribute("data-liked", "true");
+            mediaElement.setAttribute("data-liked", "true");
         } else {
-            const updatedLikes = liked.filter((link) => link !== videoLink);
+            const updatedLikes = liked.filter((link) => link !== mediaLink);
             localStorage.setItem("liked", JSON.stringify(updatedLikes));
             likeButton.innerHTML = '<i class="bi bi-suit-heart"></i>';
-            videoElement.removeAttribute("data-liked");
+            mediaElement.removeAttribute("data-liked");
 
             const likedCategory = document.getElementById("liked_category");
             if (likedCategory) {
-                const videoContainers =
-                    likedCategory.querySelectorAll(".video-container");
-                videoContainers.forEach((container) => {
-                    if (container.querySelector("source").src === videoLink) {
+                const mediaContainers =
+                    likedCategory.querySelectorAll(".media-container");
+                mediaContainers.forEach((container) => {
+                    const videoElement = container.querySelector("video");
+                    const imgElement = container.querySelector("img");
+                    if (videoElement && videoElement.src === mediaLink) {
+                        container.remove();
+                    }
+                    if (imgElement && imgElement.src === mediaLink) {
                         container.remove();
                     }
                 });
@@ -406,27 +439,32 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
     }
 
-    function toggleSavedStatus(videoLink, videoElement, savedButton) {
+    function toggleSavedStatus(mediaLink, mediaElement, savedButton) {
         const saved = JSON.parse(localStorage.getItem("saved")) || [];
-        const issaved = saved.includes(videoLink);
+        const issaved = saved.includes(mediaLink);
 
         if (!issaved) {
-            saved.push(videoLink);
+            saved.push(mediaLink);
             localStorage.setItem("saved", JSON.stringify(saved));
             savedButton.innerHTML = '<i class="bi bi-bookmarks-fill"></i>';
-            videoElement.setAttribute("data-saved", "true");
+            mediaElement.setAttribute("data-saved", "true");
         } else {
-            const updatedsaveds = saved.filter((link) => link !== videoLink);
+            const updatedsaveds = saved.filter((link) => link !== mediaLink);
             localStorage.setItem("saved", JSON.stringify(updatedsaveds));
             savedButton.innerHTML = '<i class="bi bi-bookmarks"></i>';
-            videoElement.removeAttribute("data-saved");
+            mediaElement.removeAttribute("data-saved");
 
             const savedCategory = document.getElementById("saved_category");
             if (savedCategory) {
-                const videoContainers =
-                    savedCategory.querySelectorAll(".video-container");
-                videoContainers.forEach((container) => {
-                    if (container.querySelector("source").src === videoLink) {
+                const mediaContainers =
+                    savedCategory.querySelectorAll(".media-container");
+                mediaContainers.forEach((container) => {
+                    const videoElement = container.querySelector("video");
+                    const imgElement = container.querySelector("img");
+                    if (videoElement && videoElement.src === mediaLink) {
+                        container.remove();
+                    }
+                    if (imgElement && imgElement.src === mediaLink) {
                         container.remove();
                     }
                 });
@@ -434,28 +472,27 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
     }
 
-    function resetLoadMoreButton() {
-        if (loadMoreButton) {
-            loadMoreButton.remove();
-            loadMoreButton = null;
-        }
-    }
+    /*
+==========================
+	Fetch And Cache
+==========================
+*/
 
-    async function fetchAndCacheVideos(category) {
+    async function fetchAndCacheMedia(category) {
         if (category == "liked") {
             return JSON.parse(localStorage.getItem("liked"));
         } else if (category == "saved") {
             return JSON.parse(localStorage.getItem("saved"));
         }
 
-        const videosFolderURL = `${api}/contents/galery/` + category;
+        const mediaFolderURL = `${api}/contents/galery/` + category;
         const commitsURL = `${api}/commits`;
         const commitsResponse = await fetch(commitsURL);
         const commitsData = await commitsResponse.json();
         const latestCommitDate = commitsData[0].commit.author.date;
-        const response = await fetch(videosFolderURL);
+        const response = await fetch(mediaFolderURL);
         const data = await response.json();
-        const videoLinks = data.map((item) => item.download_url);
+        const mediaLinks = data.map((item) => item.download_url);
         const cachedCommitDate = localStorage.getItem(
             "cachedCommitDate_" + category
         );
@@ -464,7 +501,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             console.log(`${category} is caching via commit date`);
             localStorage.setItem(
                 "cached_" + category,
-                JSON.stringify(videoLinks)
+                JSON.stringify(mediaLinks)
             );
             localStorage.setItem(
                 "cachedCommitDate_" + category,
@@ -472,19 +509,19 @@ document.addEventListener("DOMContentLoaded", async function () {
             );
         }
 
-        return videoLinks;
+        return mediaLinks;
     }
 
-    async function getCachedVideos(category) {
+    async function getCachedMedia(category) {
         if (category === "tiktok" || category === "instagram") {
             return;
         }
         if (category.includes("tiktok/")) {
-            let cachedVideos = localStorage.getItem("cached_" + category);
+            let cachedMedia = localStorage.getItem("cached_" + category);
 
-            if (!cachedVideos) {
+            if (!cachedMedia) {
                 console.log(`${category} is caching...`);
-                cachedVideos = await fetchAndCacheVideos(category);
+                cachedMedia = await fetchAndCacheMedia(category);
             } else {
                 const cachedCommitDate = localStorage.getItem(
                     "cachedCommitDate_" + category
@@ -497,32 +534,32 @@ document.addEventListener("DOMContentLoaded", async function () {
                         `You Forbidden Github Api\nReason: github rate limit activated please try again after 1 hour\nResponse:`
                     );
                     console.log(commitsResponse);
-                    cachedVideos = JSON.parse(cachedVideos);
-                    cachedVideos.reverse();
+                    cachedMedia = JSON.parse(cachedMedia);
+                    cachedMedia.reverse();
                 } else {
                     const commitsData = await commitsResponse.json();
                     const latestCommitDate = commitsData[0].commit.author.date;
 
                     if (cachedCommitDate !== latestCommitDate) {
-                        console.log("YEEEYYY New Videossss");
-                        cachedVideos = await fetchAndCacheVideos(category);
+                        console.log("YEEEYYY New Mediassss");
+                        cachedMedia = await fetchAndCacheMedia(category);
                     } else {
                         console.log(
                             `Category: ${category}\ncachedCommitDate: ${cachedCommitDate}\nlatestCommitDate: ${latestCommitDate}`
                         );
-                        cachedVideos = JSON.parse(cachedVideos);
+                        cachedMedia = JSON.parse(cachedMedia);
                     }
                 }
             }
-            cachedVideos.reverse();
+            cachedMedia.reverse();
 
-            return cachedVideos;
+            return cachedMedia;
         } else if (category.includes("instagram/")) {
-            let cachedVideos = localStorage.getItem("cached_" + category);
+            let cachedMedia = localStorage.getItem("cached_" + category);
 
-            if (!cachedVideos) {
+            if (!cachedMedia) {
                 console.log(`${category} is caching...`);
-                cachedVideos = await fetchAndCacheVideos(category);
+                cachedMedia = await fetchAndCacheMedia(category);
             } else {
                 const cachedCommitDate = localStorage.getItem(
                     "cachedCommitDate_" + category
@@ -535,32 +572,32 @@ document.addEventListener("DOMContentLoaded", async function () {
                         `You Forbidden Github Api\nReason: github rate limit activated please try again after 1 hour\nResponse:`
                     );
                     console.log(commitsResponse);
-                    cachedVideos = JSON.parse(cachedVideos);
-                    cachedVideos.reverse();
+                    cachedMedia = JSON.parse(cachedMedia);
+                    cachedMedia.reverse();
                 } else {
                     const commitsData = await commitsResponse.json();
                     const latestCommitDate = commitsData[0].commit.author.date;
 
                     if (cachedCommitDate !== latestCommitDate) {
-                        console.log("YEEEYYY New Videossss");
-                        cachedVideos = await fetchAndCacheVideos(category);
+                        console.log("YEEEYYY New Mediassss");
+                        cachedMedia = await fetchAndCacheMedia(category);
                     } else {
                         console.log(
                             `Category: ${category}\ncachedCommitDate: ${cachedCommitDate}\nlatestCommitDate: ${latestCommitDate}`
                         );
-                        cachedVideos = JSON.parse(cachedVideos);
+                        cachedMedia = JSON.parse(cachedMedia);
                     }
                 }
             }
-            cachedVideos.reverse();
+            cachedMedia.reverse();
 
-            return cachedVideos;
+            return cachedMedia;
         }
-        let cachedVideos = localStorage.getItem("cached_" + category);
+        let cachedMedia = localStorage.getItem("cached_" + category);
 
-        if (!cachedVideos) {
+        if (!cachedMedia) {
             console.log(`${category} is caching...`);
-            cachedVideos = await fetchAndCacheVideos(category);
+            cachedMedia = await fetchAndCacheMedia(category);
         } else {
             const cachedCommitDate = localStorage.getItem(
                 "cachedCommitDate_" + category
@@ -573,24 +610,24 @@ document.addEventListener("DOMContentLoaded", async function () {
                     `You Forbidden Github Api\nReason: github rate limit activated please try again after 1 hour\nResponse:`
                 );
                 console.log(commitsResponse);
-                cachedVideos = JSON.parse(cachedVideos);
+                cachedMedia = JSON.parse(cachedMedia);
             } else {
                 const commitsData = await commitsResponse.json();
                 const latestCommitDate = commitsData[0].commit.author.date;
 
                 if (cachedCommitDate !== latestCommitDate) {
-                    console.log("YEEEYYY New Videossss");
-                    cachedVideos = await fetchAndCacheVideos(category);
+                    console.log("YEEEYYY New Mediassss");
+                    cachedMedia = await fetchAndCacheMedia(category);
                 } else {
                     console.log(
                         `Category: ${category}\ncachedCommitDate: ${cachedCommitDate}\nlatestCommitDate: ${latestCommitDate}`
                     );
-                    cachedVideos = JSON.parse(cachedVideos);
+                    cachedMedia = JSON.parse(cachedMedia);
                 }
             }
         }
 
-        return cachedVideos;
+        return cachedMedia;
     }
 });
 
