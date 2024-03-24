@@ -33,7 +33,7 @@ function activateEasterEgg() {
     document.getElementById("desc3").innerHTML = "Congratulations!";
     console.log("ε(´｡•᎑•`)っ 💕");
     setTimeout(() => {
-        window.location.href = "/videos.html";
+        window.location.href = "/galery.html";
     }, 2500);
 }
 

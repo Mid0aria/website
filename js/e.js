@@ -3,7 +3,7 @@ document.addEventListener("keydown", hmmnewcategory);
 document.addEventListener("DOMContentLoaded", async function () {
     checktitle();
     const api = "https://api.github.com/repos/mid0hub/website-api";
-    const videoGallery = document.getElementById("videoGallery");
+    const Default_gallery = document.getElementById("Gallery");
     const categorySelect = document.getElementById("categorySelect");
     const tiktokMenu = document.getElementById("tiktokMenu");
     const tiktokSelect = document.getElementById("tiktokSelect");
@@ -11,14 +11,13 @@ document.addEventListener("DOMContentLoaded", async function () {
     const firstcategory = categorySelect[0].value;
     const firstcategoryvideos = await getCachedVideos(firstcategory);
     displayVideosBatched(firstcategoryvideos);
-    //categorys
     categorySelect.addEventListener("change", async function () {
         const category = categorySelect.value;
 
-        videoGallery.innerHTML = "";
+        Default_gallery.innerHTML = "";
 
         if (category === "tiktok") {
-            switchCategory("videoGallery");
+            switchCategory("Default_gallery");
             tiktokMenu.style.display = "block";
             resetLoadMoreButton();
             await fetchtiktok();
@@ -36,7 +35,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             resetLoadMoreButton();
             displayVideosBatched(videoLinks);
         } else {
-            switchCategory("videoGallery");
+            switchCategory("Default_gallery");
             tiktokMenu.style.display = "none";
             const videoLinks = await getCachedVideos(category);
             resetLoadMoreButton();
@@ -52,20 +51,18 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
     }
 
-    //tiktok
     tiktokSelect.addEventListener("change", async function () {
-        videoGallery.innerHTML = "";
+        Default_gallery.innerHTML = "";
         const selecttiktok = tiktokSelect.value;
         const tiktokvideos = await getCachedVideos(`tiktok/${selecttiktok}`);
         resetLoadMoreButton();
         displayVideosBatched(tiktokvideos);
     });
 
-    // });
+    // /*});*/ //That interesting
 
     async function fetchtiktok() {
-        const tiktoksResponse = await fetch(`${api}/contents/videos/tiktok`);
-
+        const tiktoksResponse = await fetch(`${api}/contents/galery/tiktok`);
         const tiktoksData = await tiktoksResponse.json();
 
         const cachedTiktokers = localStorage.getItem("cachedtiktokers");
@@ -77,36 +74,48 @@ document.addEventListener("DOMContentLoaded", async function () {
                 JSON.stringify(tiktoksData)
             );
         } else {
-            const cachedCommitDate = localStorage.getItem(
-                "cachedCommitDate_tiktok"
-            );
-            const commitsURL = `${api}/commits`;
-            const commitsResponse = await fetch(commitsURL);
+            if (cachedTiktokers.includes("API rate limit")) {
+                console.log(
+                    "Cached Tiktokers contain API rate limit message. Removing cache."
+                );
+                localStorage.removeItem("cachedtiktokers");
+                console.log(`Tiktokers is recaching...`);
+                localStorage.setItem(
+                    "cachedtiktokers",
+                    JSON.stringify(tiktoksData)
+                );
+            } else {
+                const cachedCommitDate = localStorage.getItem(
+                    "cachedCommitDate_tiktok"
+                );
+                const commitsURL = `${api}/commits`;
+                const commitsResponse = await fetch(commitsURL);
 
-            if (commitsResponse.ok) {
-                const commitsData = await commitsResponse.json();
-                const latestCommitDate = commitsData[0].commit.author.date;
+                if (commitsResponse.ok) {
+                    const commitsData = await commitsResponse.json();
+                    const latestCommitDate = commitsData[0].commit.author.date;
 
-                if (cachedCommitDate !== latestCommitDate) {
-                    console.log("YEEEYYY New TikTokerssss");
-                    localStorage.setItem(
-                        "cachedtiktokers",
-                        JSON.stringify(tiktoksData)
-                    );
-                    localStorage.setItem(
-                        "cachedCommitDate_tiktok",
-                        latestCommitDate
-                    );
+                    if (cachedCommitDate !== latestCommitDate) {
+                        console.log("YEEEYYY New TikTokerssss");
+                        localStorage.setItem(
+                            "cachedtiktokers",
+                            JSON.stringify(tiktoksData)
+                        );
+                        localStorage.setItem(
+                            "cachedCommitDate_tiktok",
+                            latestCommitDate
+                        );
+                    } else {
+                        console.log(
+                            `Tiktokers:\ncachedCommitDate: ${cachedCommitDate}\nlatestCommitDate: ${latestCommitDate}`
+                        );
+                    }
                 } else {
                     console.log(
-                        `Tiktokers:\ncachedCommitDate: ${cachedCommitDate}\nlatestCommitDate: ${latestCommitDate}`
+                        `You Forbidden Github Api\nReason: github rate limit activated please try again after 1 hour\nResponse:`
                     );
+                    console.log(commitsResponse);
                 }
-            } else {
-                console.log(
-                    `You Forbidden Github Api\nReason: github rate limit activated please try again after 1 hour\nResponse:`
-                );
-                console.log(commitsResponse);
             }
         }
 
@@ -161,10 +170,10 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
     async function displayVideos(videoLinks) {
-        const likedVideos = localStorage.getItem("liked_videos") || "[]";
-        const parsedLikedVideos = JSON.parse(likedVideos);
-        const savedVideos = localStorage.getItem("saved_videos") || "[]";
-        const parsedsavedVideos = JSON.parse(savedVideos);
+        const liked = localStorage.getItem("liked") || "[]";
+        const parsedliked = JSON.parse(liked);
+        const saved = localStorage.getItem("saved") || "[]";
+        const parsedsaved = JSON.parse(saved);
 
         videoLinks.forEach((videoLink) => {
             const videoContainer = document.createElement("div");
@@ -177,13 +186,13 @@ document.addEventListener("DOMContentLoaded", async function () {
             sourceElement.src = videoLink;
             sourceElement.type = "video/mp4";
 
-            const isLiked = parsedLikedVideos.includes(videoLink);
+            const isLiked = parsedliked.includes(videoLink);
 
             if (isLiked) {
                 videoElement.setAttribute("data-liked", "true");
             }
 
-            const issaved = parsedsavedVideos.includes(videoLink);
+            const issaved = parsedsaved.includes(videoLink);
 
             if (issaved) {
                 videoElement.setAttribute("data-saved", "true");
@@ -216,26 +225,23 @@ document.addEventListener("DOMContentLoaded", async function () {
 
             videoContainer.appendChild(savedButton);
 
-            videoGallery.appendChild(videoContainer);
+            Default_gallery.appendChild(videoContainer);
             checkambiance();
         });
     }
 
     function toggleLikeStatus(videoLink, videoElement, likeButton) {
-        const likedVideos =
-            JSON.parse(localStorage.getItem("liked_videos")) || [];
-        const isLiked = likedVideos.includes(videoLink);
+        const liked = JSON.parse(localStorage.getItem("liked")) || [];
+        const isLiked = liked.includes(videoLink);
 
         if (!isLiked) {
-            likedVideos.push(videoLink);
-            localStorage.setItem("liked_videos", JSON.stringify(likedVideos));
+            liked.push(videoLink);
+            localStorage.setItem("liked", JSON.stringify(liked));
             likeButton.innerHTML = '<i class="bi bi-suit-heart-fill"></i>';
             videoElement.setAttribute("data-liked", "true");
         } else {
-            const updatedLikes = likedVideos.filter(
-                (link) => link !== videoLink
-            );
-            localStorage.setItem("liked_videos", JSON.stringify(updatedLikes));
+            const updatedLikes = liked.filter((link) => link !== videoLink);
+            localStorage.setItem("liked", JSON.stringify(updatedLikes));
             likeButton.innerHTML = '<i class="bi bi-suit-heart"></i>';
             videoElement.removeAttribute("data-liked");
 
@@ -253,20 +259,17 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
     function toggleSavedStatus(videoLink, videoElement, savedButton) {
-        const savedVideos =
-            JSON.parse(localStorage.getItem("saved_videos")) || [];
-        const issaved = savedVideos.includes(videoLink);
+        const saved = JSON.parse(localStorage.getItem("saved")) || [];
+        const issaved = saved.includes(videoLink);
 
         if (!issaved) {
-            savedVideos.push(videoLink);
-            localStorage.setItem("saved_videos", JSON.stringify(savedVideos));
+            saved.push(videoLink);
+            localStorage.setItem("saved", JSON.stringify(saved));
             savedButton.innerHTML = '<i class="bi bi-bookmarks-fill"></i>';
             videoElement.setAttribute("data-saved", "true");
         } else {
-            const updatedsaveds = savedVideos.filter(
-                (link) => link !== videoLink
-            );
-            localStorage.setItem("saved_videos", JSON.stringify(updatedsaveds));
+            const updatedsaveds = saved.filter((link) => link !== videoLink);
+            localStorage.setItem("saved", JSON.stringify(updatedsaveds));
             savedButton.innerHTML = '<i class="bi bi-bookmarks"></i>';
             videoElement.removeAttribute("data-saved");
 
@@ -292,12 +295,12 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     async function fetchAndCacheVideos(category) {
         if (category == "liked") {
-            return JSON.parse(localStorage.getItem("liked_videos"));
+            return JSON.parse(localStorage.getItem("liked"));
         } else if (category == "saved") {
-            return JSON.parse(localStorage.getItem("saved_videos"));
+            return JSON.parse(localStorage.getItem("saved"));
         }
 
-        const videosFolderURL = `${api}/contents/videos/` + category;
+        const videosFolderURL = `${api}/contents/galery/` + category;
         const commitsURL = `${api}/commits`;
         const commitsResponse = await fetch(commitsURL);
         const commitsData = await commitsResponse.json();
@@ -311,7 +314,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
         if (!cachedCommitDate || cachedCommitDate !== latestCommitDate) {
             localStorage.setItem(
-                "cachedVideos_" + category,
+                "cached_" + category,
                 JSON.stringify(videoLinks)
             );
             localStorage.setItem(
@@ -328,7 +331,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             return;
         }
         if (category.includes("tiktok/")) {
-            let cachedVideos = localStorage.getItem("cachedVideos_" + category);
+            let cachedVideos = localStorage.getItem("cached_" + category);
 
             if (!cachedVideos) {
                 console.log(`${category} is caching...`);
@@ -366,7 +369,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
             return cachedVideos;
         }
-        let cachedVideos = localStorage.getItem("cachedVideos_" + category);
+        let cachedVideos = localStorage.getItem("cached_" + category);
 
         if (!cachedVideos) {
             console.log(`${category} is caching...`);
