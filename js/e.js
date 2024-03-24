@@ -545,12 +545,15 @@ function hmmnewcategory(event) {
         if (newcategorykeyposition === newcategorykeys.length) {
             console.log("Hmm new category... interesting");
 
-            localStorage.setItem("tiktokCategory", true);
+            localStorage.setItem("newCategorys", true);
 
             const categorySelect = document.getElementById("categorySelect");
 
             const tiktokOption = categorySelect.querySelector(
                 'option[value="tiktok"]'
+            );
+            const instagramOption = categorySelect.querySelector(
+                'option[value="instagram"]'
             );
             if (!tiktokOption) {
                 const newOption = document.createElement("option");
@@ -559,6 +562,14 @@ function hmmnewcategory(event) {
                 categorySelect.appendChild(newOption);
                 console.log("tiktok category added!");
             }
+            /*
+            if (!instagramOption) {
+                const newOption = document.createElement("option");
+                newOption.value = "instagram";
+                newOption.textContent = "🔴 instagram 🟡";
+                categorySelect.appendChild(newOption);
+                console.log("instagram category added!");
+            }*/
             newcategorykeyposition = 0;
         }
     } else {
@@ -566,17 +577,25 @@ function hmmnewcategory(event) {
     }
 }
 
-const tiktokCategory = localStorage.getItem("tiktokCategory");
-if (tiktokCategory !== null && tiktokCategory === "true") {
+const newCategorys = localStorage.getItem("newCategorys");
+if (newCategorys !== null && newCategorys === "true") {
     const categorySelect = document.getElementById("categorySelect");
     const tiktokOption = categorySelect.querySelector('option[value="tiktok"]');
+    // const instagramOption = categorySelect.querySelector('option[value="instagram"]');
     if (!tiktokOption) {
         const newOption = document.createElement("option");
         newOption.value = "tiktok";
         newOption.textContent = "💃 tiktok 💃";
         categorySelect.appendChild(newOption);
         console.log("tiktok category added!");
-    }
+    } /*
+    if (!instagramOption) {
+        const newOption = document.createElement("option");
+        newOption.value = "instagram";
+        newOption.textContent = "🔴 instagram 🟡";
+        categorySelect.appendChild(newOption);
+        console.log("instagram category added!");
+    }*/
 }
 
 document.addEventListener("keydown", hmmnewcategory);
