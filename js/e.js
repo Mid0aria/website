@@ -3,10 +3,11 @@ document.addEventListener("keydown", hmmnewcategory);
 document.addEventListener("DOMContentLoaded", async function () {
     checktitle();
     const api = "https://api.github.com/repos/mid0hub/website-api";
-    const Default_gallery = document.getElementById("Gallery");
+    const Gallery = document.getElementById("Gallery");
     const categorySelect = document.getElementById("categorySelect");
     const tiktokMenu = document.getElementById("tiktokMenu");
     const tiktokSelect = document.getElementById("tiktokSelect");
+    const instagramMenu = document.getElementById("instagramMenu");
     let loadMoreButton = null;
     const firstcategory = categorySelect[0].value;
     const firstcategoryvideos = await getCachedVideos(firstcategory);
@@ -14,29 +15,38 @@ document.addEventListener("DOMContentLoaded", async function () {
     categorySelect.addEventListener("change", async function () {
         const category = categorySelect.value;
 
-        Default_gallery.innerHTML = "";
+        Gallery.innerHTML = "";
 
         if (category === "tiktok") {
-            switchCategory("Default_gallery");
+            switchCategory("Gallery");
             tiktokMenu.style.display = "block";
+            instagramMenu.style.display = "none";
             resetLoadMoreButton();
             await fetchtiktok();
+        } else if (category === "instagram") {
+            switchCategory("Gallery");
+            tiktokMenu.style.display = "none";
+            instagramMenu.style.display = "block";
+            resetLoadMoreButton();
+            await fetchInstagram();
         } else if (category === "liked") {
             switchCategory("liked_category");
             tiktokMenu.style.display = "none";
+            instagramMenu.style.display = "none";
             const videoLinks = await getCachedVideos(category);
             resetLoadMoreButton();
-
             displayVideosBatched(videoLinks);
         } else if (category === "saved") {
             switchCategory("saved_category");
             tiktokMenu.style.display = "none";
+            instagramMenu.style.display = "none";
             const videoLinks = await getCachedVideos(category);
             resetLoadMoreButton();
             displayVideosBatched(videoLinks);
         } else {
-            switchCategory("Default_gallery");
+            switchCategory("Gallery");
             tiktokMenu.style.display = "none";
+            instagramMenu.style.display = "none";
             const videoLinks = await getCachedVideos(category);
             resetLoadMoreButton();
             displayVideosBatched(videoLinks);
@@ -52,11 +62,23 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
     tiktokSelect.addEventListener("change", async function () {
-        Default_gallery.innerHTML = "";
+        Gallery.innerHTML = "";
         const selecttiktok = tiktokSelect.value;
         const tiktokvideos = await getCachedVideos(`tiktok/${selecttiktok}`);
         resetLoadMoreButton();
         displayVideosBatched(tiktokvideos);
+    });
+
+    //instagram
+    instagramSelect.addEventListener("change", async function () {
+        Gallery.innerHTML = "";
+        selectInstagram = instagramSelect.value;
+        const instagramVideos = await getCachedVideos(
+            `instagram/${selectInstagram}`
+        );
+
+        resetLoadMoreButton();
+        displayVideosBatched(instagramVideos);
     });
 
     // /*});*/ //That interesting
@@ -138,6 +160,87 @@ document.addEventListener("DOMContentLoaded", async function () {
         displayVideosBatched(firstTiktokVideos);
     }
 
+    async function fetchInstagram() {
+        const instagramsResponse = await fetch(
+            `${api}/contents/galery/instagram`
+        );
+
+        const instagramsData = await instagramsResponse.json();
+
+        const cachedInstagrammers = localStorage.getItem("cachedInstagrammers");
+        if (!cachedInstagrammers) {
+            console.log(`Instagrammers is caching...`);
+            localStorage.setItem(
+                "cachedInstagrammers",
+                JSON.stringify(instagramsData)
+            );
+        } else {
+            if (cachedInstagrammers.includes("API rate limit")) {
+                console.log(
+                    "Cached Instagrammers contain API rate limit message. Removing cache."
+                );
+                localStorage.removeItem("cachedInstagrammers");
+                console.log(`Instagrammers is recaching...`);
+                localStorage.setItem(
+                    "cachedInstagrammers",
+                    JSON.stringify(instagramsData)
+                );
+            } else {
+                const cachedCommitDate = localStorage.getItem(
+                    "cachedCommitDate_instagram"
+                );
+                const commitsURL = `${api}/commits`;
+                const commitsResponse = await fetch(commitsURL);
+
+                if (commitsResponse.ok) {
+                    const commitsData = await commitsResponse.json();
+                    const latestCommitDate = commitsData[0].commit.author.date;
+
+                    if (cachedCommitDate !== latestCommitDate) {
+                        console.log("YEEEYYY New instagrammerssss");
+                        localStorage.setItem(
+                            "cachedInstagrammers",
+                            JSON.stringify(instagramsData)
+                        );
+                        localStorage.setItem(
+                            "cachedCommitDate_instagram",
+                            latestCommitDate
+                        );
+                    } else {
+                        console.log(
+                            `Instagrammers:\ncachedCommitDate: ${cachedCommitDate}\nlatestCommitDate: ${latestCommitDate}`
+                        );
+                    }
+                } else {
+                    console.log(
+                        `You Forbidden Github Api\nReason: github rate limit activated please try again after 1 hour\nResponse:`
+                    );
+                    console.log(commitsResponse);
+                }
+            }
+        }
+
+        const updatedCachedInstagrammers = localStorage.getItem(
+            "cachedInstagrammers"
+        );
+        const instagrammers = JSON.parse(updatedCachedInstagrammers);
+
+        instagramSelect.innerHTML = "";
+
+        instagrammers.forEach((instagramer) => {
+            const instagramOption = document.createElement("option");
+            instagramOption.value = instagramer.name;
+            instagramOption.textContent = instagramer.name;
+            instagramSelect.appendChild(instagramOption);
+        });
+
+        const firstInstagram = instagrammers[0].name;
+        let cachedInstagramerImages = await getCachedVideos(
+            `instagram/${firstInstagram}`
+        );
+        displayVideosBatched(cachedInstagramerImages);
+    }
+
     async function displayVideosBatched(videoLinks) {
         if (!videoLinks) {
             return;
@@ -147,7 +250,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         function loadNextBatch() {
             const batch = videoLinks.slice(startIndex, startIndex + batchSize);
             if (batch.length > 0) {
-                displayVideos(batch);
+                displayMedia(batch);
                 startIndex += batchSize;
             } else {
                 loadMoreButton.style.display = "none";
@@ -169,37 +272,50 @@ document.addEventListener("DOMContentLoaded", async function () {
         document.body.appendChild(loadMoreButton);
     }
 
-    async function displayVideos(videoLinks) {
+    async function displayMedia(mediaLinks) {
         const liked = localStorage.getItem("liked") || "[]";
-        const parsedliked = JSON.parse(liked);
+        const parsedLiked = JSON.parse(liked);
         const saved = localStorage.getItem("saved") || "[]";
-        const parsedsaved = JSON.parse(saved);
+        const parsedSaved = JSON.parse(saved);
 
-        videoLinks.forEach((videoLink) => {
-            const videoContainer = document.createElement("div");
-            videoContainer.classList.add("video-container");
+        mediaLinks.forEach((mediaLink) => {
+            const mediaContainer = document.createElement("div");
+            mediaContainer.classList.add("media-container");
 
-            const videoElement = document.createElement("video");
-            videoElement.controls = true;
-            videoElement.style.height = "100%";
-            const sourceElement = document.createElement("source");
-            sourceElement.src = videoLink;
-            sourceElement.type = "video/mp4";
+            let mediaElement;
+            if (mediaLink.endsWith(".mp4")) {
+                // Video formatına uygun şekilde gösterim
+                mediaElement = document.createElement("video");
+                mediaElement.controls = true;
+            } else if (
+                mediaLink.endsWith(".png") ||
+                mediaLink.endsWith(".jpg") ||
+                mediaLink.endsWith(".webp")
+            ) {
+                // Resim formatına uygun şekilde gösterim
+                mediaElement = document.createElement("img");
+                mediaElement.addEventListener("click", () => {
+                    openPopup(mediaLink); // Resme tıklandığında popup aç
+                });
+            } else {
+                // Diğer durumlar için uygun işlem
+                console.error("Unsupported media format:", mediaLink);
+                return; // Sonraki adıma geçmeden fonksiyondan çık
+            }
 
-            const isLiked = parsedliked.includes(videoLink);
+            mediaElement.src = mediaLink;
 
+            const isLiked = parsedLiked.includes(mediaLink);
             if (isLiked) {
-                videoElement.setAttribute("data-liked", "true");
+                mediaElement.setAttribute("data-liked", "true");
             }
 
-            const issaved = parsedsaved.includes(videoLink);
-
-            if (issaved) {
-                videoElement.setAttribute("data-saved", "true");
+            const isSaved = parsedSaved.includes(mediaLink);
+            if (isSaved) {
+                mediaElement.setAttribute("data-saved", "true");
             }
 
-            videoElement.appendChild(sourceElement);
-            videoContainer.appendChild(videoElement);
+            mediaContainer.appendChild(mediaElement);
 
             const likeButton = document.createElement("button");
             likeButton.innerHTML = isLiked
@@ -208,26 +324,58 @@ document.addEventListener("DOMContentLoaded", async function () {
             likeButton.classList.add("like-button");
 
             likeButton.addEventListener("click", function () {
-                toggleLikeStatus(videoLink, videoElement, likeButton);
+                toggleLikeStatus(mediaLink, mediaElement, likeButton);
             });
 
-            videoContainer.appendChild(likeButton);
+            mediaContainer.appendChild(likeButton);
 
             const savedButton = document.createElement("button");
-            savedButton.innerHTML = issaved
+            savedButton.innerHTML = isSaved
                 ? '<i class="bi bi-bookmarks-fill"></i>'
                 : '<i class="bi bi-bookmarks"></i>';
             savedButton.classList.add("saved-button");
 
             savedButton.addEventListener("click", function () {
-                toggleSavedStatus(videoLink, videoElement, savedButton);
+                toggleSavedStatus(mediaLink, mediaElement, savedButton);
             });
 
-            videoContainer.appendChild(savedButton);
+            mediaContainer.appendChild(savedButton);
 
-            Default_gallery.appendChild(videoContainer);
-            checkambiance();
+            Gallery.appendChild(mediaContainer);
         });
+    }
+
+    function openPopup(imageUrl) {
+        const popupContainer = document.createElement("div");
+        popupContainer.classList.add("popup-container");
+
+        const popupContent = document.createElement("div");
+        popupContent.classList.add("popup-content");
+
+        const popupImage = document.createElement("img");
+        popupImage.src = imageUrl;
+        popupContent.appendChild(popupImage);
+
+        const closeButton = document.createElement("span");
+        closeButton.innerHTML = `<i class="bi bi-x-circle"></i>`;
+        closeButton.classList.add("close-btn");
+        closeButton.style =
+            "position:absolute; top: -10px; right: 20px;font-size: 24px; padding: 5px;";
+
+        closeButton.addEventListener("click", function () {
+            closePopup(popupContainer);
+        });
+
+        popupContent.appendChild(closeButton);
+        popupContainer.appendChild(popupContent);
+
+        document.body.appendChild(popupContainer);
+        popupContainer.style.display = "block";
+    }
+
+    function closePopup(popupContainer) {
+        popupContainer.style.display = "none";
+        document.body.removeChild(popupContainer);
     }
 
     function toggleLikeStatus(videoLink, videoElement, likeButton) {
@@ -313,6 +461,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         );
 
         if (!cachedCommitDate || cachedCommitDate !== latestCommitDate) {
+            console.log(`${category} is caching via commit date`);
             localStorage.setItem(
                 "cached_" + category,
                 JSON.stringify(videoLinks)
@@ -327,10 +476,48 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
     async function getCachedVideos(category) {
-        if (category === "tiktok") {
+        if (category === "tiktok" || category === "instagram") {
             return;
         }
         if (category.includes("tiktok/")) {
+            let cachedVideos = localStorage.getItem("cached_" + category);
+
+            if (!cachedVideos) {
+                console.log(`${category} is caching...`);
+                cachedVideos = await fetchAndCacheVideos(category);
+            } else {
+                const cachedCommitDate = localStorage.getItem(
+                    "cachedCommitDate_" + category
+                );
+                const commitsURL = `${api}/commits`;
+                const commitsResponse = await fetch(commitsURL);
+
+                if (commitsResponse.status === 403) {
+                    console.log(
+                        `You Forbidden Github Api\nReason: github rate limit activated please try again after 1 hour\nResponse:`
+                    );
+                    console.log(commitsResponse);
+                    cachedVideos = JSON.parse(cachedVideos);
+                    cachedVideos.reverse();
+                } else {
+                    const commitsData = await commitsResponse.json();
+                    const latestCommitDate = commitsData[0].commit.author.date;
+
+                    if (cachedCommitDate !== latestCommitDate) {
+                        console.log("YEEEYYY New Videossss");
+                        cachedVideos = await fetchAndCacheVideos(category);
+                    } else {
+                        console.log(
+                            `Category: ${category}\ncachedCommitDate: ${cachedCommitDate}\nlatestCommitDate: ${latestCommitDate}`
+                        );
+                        cachedVideos = JSON.parse(cachedVideos);
+                    }
+                }
+            }
+            cachedVideos.reverse();
+
+            return cachedVideos;
+        } else if (category.includes("instagram/")) {
             let cachedVideos = localStorage.getItem("cached_" + category);
 
             if (!cachedVideos) {
@@ -544,11 +731,8 @@ function hmmnewcategory(event) {
 
         if (newcategorykeyposition === newcategorykeys.length) {
             console.log("Hmm new category... interesting");
-
             localStorage.setItem("newCategorys", true);
-
             const categorySelect = document.getElementById("categorySelect");
-
             const tiktokOption = categorySelect.querySelector(
                 'option[value="tiktok"]'
             );
@@ -562,14 +746,14 @@ function hmmnewcategory(event) {
                 categorySelect.appendChild(newOption);
                 console.log("tiktok category added!");
             }
-            /*
+
             if (!instagramOption) {
                 const newOption = document.createElement("option");
                 newOption.value = "instagram";
                 newOption.textContent = "🔴 instagram 🟡";
                 categorySelect.appendChild(newOption);
                 console.log("instagram category added!");
-            }*/
+            }
             newcategorykeyposition = 0;
         }
     } else {
@@ -581,21 +765,23 @@ const newCategorys = localStorage.getItem("newCategorys");
 if (newCategorys !== null && newCategorys === "true") {
     const categorySelect = document.getElementById("categorySelect");
     const tiktokOption = categorySelect.querySelector('option[value="tiktok"]');
-    // const instagramOption = categorySelect.querySelector('option[value="instagram"]');
+    const instagramOption = categorySelect.querySelector(
+        'option[value="instagram"]'
+    );
     if (!tiktokOption) {
         const newOption = document.createElement("option");
         newOption.value = "tiktok";
         newOption.textContent = "💃 tiktok 💃";
         categorySelect.appendChild(newOption);
         console.log("tiktok category added!");
-    } /*
+    }
     if (!instagramOption) {
         const newOption = document.createElement("option");
         newOption.value = "instagram";
         newOption.textContent = "🔴 instagram 🟡";
         categorySelect.appendChild(newOption);
         console.log("instagram category added!");
-    }*/
+    }
 }
 
 document.addEventListener("keydown", hmmnewcategory);
