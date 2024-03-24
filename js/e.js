@@ -340,7 +340,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             });
 
             mediaContainer.appendChild(savedButton);
-
+            checkambiance();
             Gallery.appendChild(mediaContainer);
         });
     }
@@ -610,9 +610,9 @@ function checkambiance() {
     if (isAmbianceMode && isAmbianceMode === "true") {
         ambianceToggleSwitch.checked = true;
         document
-            .querySelectorAll(".video-container")
-            .forEach(function (videoContainer) {
-                videoContainer.style.boxShadow = "0 0 20px rgb(255, 255, 255)";
+            .querySelectorAll(".media-container")
+            .forEach(function (mediaContainer) {
+                mediaContainer.style.boxShadow = "0 0 20px rgb(255, 255, 255)";
             });
     }
 }
@@ -632,16 +632,16 @@ function checktitle() {
 ambianceToggleSwitch.addEventListener("change", function () {
     if (ambianceToggleSwitch.checked) {
         document
-            .querySelectorAll(".video-container")
-            .forEach(function (videoContainer) {
-                videoContainer.style.boxShadow = "0 0 20px rgb(255, 255, 255)";
+            .querySelectorAll(".media-container")
+            .forEach(function (mediaContainer) {
+                mediaContainer.style.boxShadow = "0 0 20px rgb(255, 255, 255)";
             });
         localStorage.setItem("ambianceMode", "true");
     } else {
         document
-            .querySelectorAll(".video-container")
-            .forEach(function (videoContainer) {
-                videoContainer.style.boxShadow = "0 0 20px rgb(0, 0, 0)";
+            .querySelectorAll(".media-container")
+            .forEach(function (mediaContainer) {
+                mediaContainer.style.boxShadow = "0 0 20px rgb(0, 0, 0)";
             });
         localStorage.setItem("ambianceMode", "false");
     }
