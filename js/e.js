@@ -358,13 +358,6 @@ document.addEventListener("DOMContentLoaded", async function () {
 ==========================
 */
 
-    document.addEventListener("click", function (event) {
-        const popup = document.querySelector(".popup-container");
-        if (popup && !popup.contains(event.target)) {
-            popup.remove();
-        }
-    });
-
     function openPopup(imageUrl) {
         const existingPopup = document.querySelector(".popup-container");
         if (existingPopup) {
@@ -384,7 +377,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         closeButton.innerHTML = `<i class="bi bi-x-circle"></i>`;
         closeButton.classList.add("close-btn");
         closeButton.style =
-            "position:absolute; top: -10px; right: 20px;font-size: 24px; padding: 5px;";
+            "position:absolute; top: 50px; right: -35px; font-size: 35px; padding: 5px;";
 
         closeButton.addEventListener("click", function () {
             closePopup(popupContainer);
