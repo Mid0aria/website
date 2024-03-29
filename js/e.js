@@ -632,32 +632,10 @@ document.addEventListener("DOMContentLoaded", async function () {
 const settingsButton = document.getElementById("settingsButton");
 const settingsModal = document.getElementById("settingsModal");
 const ambianceToggleSwitch = document.getElementById("ambianceToggleSwitch");
+// const ambianceColorPicker = document.getElementById("ambianceColorPicker");
 const changeTitleInput = document.getElementById("newTitle");
 const resetTitleButton = document.getElementById("resettitle");
 const desc1 = document.getElementById("desc1");
-function checkambiance() {
-    const isAmbianceMode = localStorage.getItem("ambianceMode");
-    if (isAmbianceMode && isAmbianceMode === "true") {
-        ambianceToggleSwitch.checked = true;
-        document
-            .querySelectorAll(".media-container")
-            .forEach(function (mediaContainer) {
-                mediaContainer.style.boxShadow = "0 0 20px rgb(255, 255, 255)";
-            });
-    }
-}
-
-function checktitle() {
-    const title = localStorage.getItem("title");
-    if (title) {
-        if (title.trim() === "") {
-            desc1.textContent = "ε(´｡•᎑•`)っ 💕";
-            localStorage.setItem("title", desc1.textContent);
-        } else {
-            desc1.textContent = title;
-        }
-    }
-}
 
 ambianceToggleSwitch.addEventListener("change", function () {
     if (ambianceToggleSwitch.checked) {
@@ -692,6 +670,30 @@ settingsButton.addEventListener("click", function () {
 
 function closeModal() {
     settingsModal.style.display = "none";
+}
+
+function checkambiance() {
+    const isAmbianceMode = localStorage.getItem("ambianceMode");
+    if (isAmbianceMode && isAmbianceMode === "true") {
+        ambianceToggleSwitch.checked = true;
+        document
+            .querySelectorAll(".media-container")
+            .forEach(function (mediaContainer) {
+                mediaContainer.style.boxShadow = "0 0 20px rgb(255, 255, 255)";
+            });
+    }
+}
+
+function checktitle() {
+    const title = localStorage.getItem("title");
+    if (title) {
+        if (title.trim() === "") {
+            desc1.textContent = "ε(´｡•᎑•`)っ 💕";
+            localStorage.setItem("title", desc1.textContent);
+        } else {
+            desc1.textContent = title;
+        }
+    }
 }
 
 /*
