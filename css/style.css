@@ -128,11 +128,13 @@ img {
     filter: brightness(0.6);
 }
 
-svg {
+svg,
+i {
     height: 25px;
     width: 25px;
     fill: #7f7f7f;
     padding: 10px;
+    font-size: 30px;
 }
 
 .clickable {
