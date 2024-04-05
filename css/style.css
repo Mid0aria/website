@@ -5,6 +5,8 @@
 
 ==========================
 */
+/* styles.css */
+@import url("./rainbow.css");
 
 canvas {
     position: absolute;
@@ -75,7 +77,8 @@ img {
 .title {
     line-height: 1em;
     margin: 10px 0;
-    color: #fff;
+    color: #ffffff;
+    text-shadow: 2px 2px 3px rgba(0, 0, 0, 0.1);
     width: auto;
     height: auto;
     display: block;
