@@ -57,7 +57,11 @@ document.addEventListener("DOMContentLoaded", async function () {
         const container = document.querySelector(".gallery");
         if (container) {
             container.id = a;
-            console.log(`Switched to ${a}.`);
+            console.log(
+                "%c Switch Category ",
+                "background: purple; color: white; font-size: 15px; font-weight: bold;",
+                `Switched to ${a}.`
+            );
         }
     }
 
@@ -89,7 +93,11 @@ document.addEventListener("DOMContentLoaded", async function () {
         const cachedTiktokers = localStorage.getItem("cachedtiktokers");
 
         if (!cachedTiktokers) {
-            console.log(`Tiktokers is caching...`);
+            console.log(
+                "%c Fetch Tiktok ",
+                "background: purple; color: white; font-size: 15px; font-weight: bold;",
+                `Tiktokers is caching...`
+            );
             localStorage.setItem(
                 "cachedtiktokers",
                 JSON.stringify(tiktoksData)
@@ -97,10 +105,16 @@ document.addEventListener("DOMContentLoaded", async function () {
         } else {
             if (cachedTiktokers.includes("API rate limit")) {
                 console.log(
+                    "%c Fetch Tiktok ",
+                    "background: purple; color: white; font-size: 15px; font-weight: bold;",
                     "Cached Tiktokers contain API rate limit message. Removing cache."
                 );
                 localStorage.removeItem("cachedtiktokers");
-                console.log(`Tiktokers is recaching...`);
+                console.log(
+                    "%c Fetch Tiktok ",
+                    "background: purple; color: white; font-size: 15px; font-weight: bold;",
+                    `Tiktokers is recaching...`
+                );
                 localStorage.setItem(
                     "cachedtiktokers",
                     JSON.stringify(tiktoksData)
@@ -117,7 +131,11 @@ document.addEventListener("DOMContentLoaded", async function () {
                     const latestCommitDate = commitsData[0].commit.author.date;
 
                     if (cachedCommitDate !== latestCommitDate) {
-                        console.log("YEEEYYY New TikTokerssss");
+                        console.log(
+                            "%c Fetch Tiktok ",
+                            "background: purple; color: white; font-size: 15px; font-weight: bold;",
+                            "YEEEYYY New TikTokerssss"
+                        );
                         localStorage.setItem(
                             "cachedtiktokers",
                             JSON.stringify(tiktoksData)
@@ -128,14 +146,22 @@ document.addEventListener("DOMContentLoaded", async function () {
                         );
                     } else {
                         console.log(
+                            "%c Fetch Tiktok ",
+                            "background: purple; color: white; font-size: 15px; font-weight: bold;",
                             `Tiktokers:\ncachedCommitDate: ${cachedCommitDate}\nlatestCommitDate: ${latestCommitDate}`
                         );
                     }
                 } else {
                     console.log(
+                        "%c Fetch Tiktok ",
+                        "background: purple; color: white; font-size: 15px; font-weight: bold;",
                         `You Forbidden Github Api\nReason: github rate limit activated please try again after 1 hour\nResponse:`
                     );
-                    console.log(commitsResponse);
+                    console.log(
+                        "%c Fetch Tiktok ",
+                        "background: purple; color: white; font-size: 15px; font-weight: bold;",
+                        commitsResponse
+                    );
                 }
             }
         }
@@ -166,7 +192,11 @@ document.addEventListener("DOMContentLoaded", async function () {
 
         const cachedInstagrammers = localStorage.getItem("cachedInstagrammers");
         if (!cachedInstagrammers) {
-            console.log(`Instagrammers is caching...`);
+            console.log(
+                "%c Fetch Instagram ",
+                "background: purple; color: white; font-size: 15px; font-weight: bold;",
+                `Instagrammers is caching...`
+            );
             localStorage.setItem(
                 "cachedInstagrammers",
                 JSON.stringify(instagramsData)
@@ -174,10 +204,16 @@ document.addEventListener("DOMContentLoaded", async function () {
         } else {
             if (cachedInstagrammers.includes("API rate limit")) {
                 console.log(
+                    "%c Fetch Instagram ",
+                    "background: purple; color: white; font-size: 15px; font-weight: bold;",
                     "Cached Instagrammers contain API rate limit message. Removing cache."
                 );
                 localStorage.removeItem("cachedInstagrammers");
-                console.log(`Instagrammers is recaching...`);
+                console.log(
+                    "%c Fetch Instagram ",
+                    "background: purple; color: white; font-size: 15px; font-weight: bold;",
+                    `Instagrammers is recaching...`
+                );
                 localStorage.setItem(
                     "cachedInstagrammers",
                     JSON.stringify(instagramsData)
@@ -194,7 +230,11 @@ document.addEventListener("DOMContentLoaded", async function () {
                     const latestCommitDate = commitsData[0].commit.author.date;
 
                     if (cachedCommitDate !== latestCommitDate) {
-                        console.log("YEEEYYY New instagrammerssss");
+                        console.log(
+                            "%c Fetch Instagram ",
+                            "background: purple; color: white; font-size: 15px; font-weight: bold;",
+                            "YEEEYYY New instagrammerssss"
+                        );
                         localStorage.setItem(
                             "cachedInstagrammers",
                             JSON.stringify(instagramsData)
@@ -205,14 +245,22 @@ document.addEventListener("DOMContentLoaded", async function () {
                         );
                     } else {
                         console.log(
+                            "%c Fetch Instagram ",
+                            "background: purple; color: white; font-size: 15px; font-weight: bold;",
                             `Instagrammers:\ncachedCommitDate: ${cachedCommitDate}\nlatestCommitDate: ${latestCommitDate}`
                         );
                     }
                 } else {
                     console.log(
+                        "%c Fetch Instagram ",
+                        "background: purple; color: white; font-size: 15px; font-weight: bold;",
                         `You Forbidden Github Api\nReason: github rate limit activated please try again after 1 hour\nResponse:`
                     );
-                    console.log(commitsResponse);
+                    console.log(
+                        "%c Fetch Instagram ",
+                        "background: purple; color: white; font-size: 15px; font-weight: bold;",
+                        commitsResponse
+                    );
                 }
             }
         }
@@ -491,7 +539,11 @@ document.addEventListener("DOMContentLoaded", async function () {
         );
 
         if (!cachedCommitDate || cachedCommitDate !== latestCommitDate) {
-            console.log(`${category} is caching via commit date`);
+            console.log(
+                "%c fetchAndCacheMedia ",
+                "background: purple; color: white; font-size: 15px; font-weight: bold;",
+                `${category} is caching via commit date`
+            );
             localStorage.setItem(
                 "cached_" + category,
                 JSON.stringify(mediaLinks)
@@ -513,7 +565,11 @@ document.addEventListener("DOMContentLoaded", async function () {
             let cachedMedia = localStorage.getItem("cached_" + category);
 
             if (!cachedMedia) {
-                console.log(`${category} is caching...`);
+                console.log(
+                    "%c Get Cached Media ",
+                    "background: purple; color: white; font-size: 15px; font-weight: bold;",
+                    `${category} is caching...`
+                );
                 cachedMedia = await fetchAndCacheMedia(category);
             } else {
                 const cachedCommitDate = localStorage.getItem(
@@ -524,9 +580,15 @@ document.addEventListener("DOMContentLoaded", async function () {
 
                 if (commitsResponse.status === 403) {
                     console.log(
+                        "%c Get Cached Media ",
+                        "background: purple; color: white; font-size: 15px; font-weight: bold;",
                         `You Forbidden Github Api\nReason: github rate limit activated please try again after 1 hour\nResponse:`
                     );
-                    console.log(commitsResponse);
+                    console.log(
+                        "%c Get Cached Media ",
+                        "background: purple; color: white; font-size: 15px; font-weight: bold;",
+                        commitsResponse
+                    );
                     cachedMedia = JSON.parse(cachedMedia);
                     cachedMedia.reverse();
                 } else {
@@ -534,10 +596,16 @@ document.addEventListener("DOMContentLoaded", async function () {
                     const latestCommitDate = commitsData[0].commit.author.date;
 
                     if (cachedCommitDate !== latestCommitDate) {
-                        console.log("YEEEYYY New Mediassss");
+                        console.log(
+                            "%c Get Cached Media ",
+                            "background: purple; color: white; font-size: 15px; font-weight: bold;",
+                            "YEEEYYY New Mediassss"
+                        );
                         cachedMedia = await fetchAndCacheMedia(category);
                     } else {
                         console.log(
+                            "%c Get Cached Media ",
+                            "background: purple; color: white; font-size: 15px; font-weight: bold;",
                             `Category: ${category}\ncachedCommitDate: ${cachedCommitDate}\nlatestCommitDate: ${latestCommitDate}`
                         );
                         cachedMedia = JSON.parse(cachedMedia);
@@ -551,7 +619,11 @@ document.addEventListener("DOMContentLoaded", async function () {
             let cachedMedia = localStorage.getItem("cached_" + category);
 
             if (!cachedMedia) {
-                console.log(`${category} is caching...`);
+                console.log(
+                    "%c Get Cached Media ",
+                    "background: purple; color: white; font-size: 15px; font-weight: bold;",
+                    `${category} is caching...`
+                );
                 cachedMedia = await fetchAndCacheMedia(category);
             } else {
                 const cachedCommitDate = localStorage.getItem(
@@ -562,9 +634,15 @@ document.addEventListener("DOMContentLoaded", async function () {
 
                 if (commitsResponse.status === 403) {
                     console.log(
+                        "%c Get Cached Media ",
+                        "background: purple; color: white; font-size: 15px; font-weight: bold;",
                         `You Forbidden Github Api\nReason: github rate limit activated please try again after 1 hour\nResponse:`
                     );
-                    console.log(commitsResponse);
+                    console.log(
+                        "%c Get Cached Media ",
+                        "background: purple; color: white; font-size: 15px; font-weight: bold;",
+                        commitsResponse
+                    );
                     cachedMedia = JSON.parse(cachedMedia);
                     cachedMedia.reverse();
                 } else {
@@ -572,10 +650,16 @@ document.addEventListener("DOMContentLoaded", async function () {
                     const latestCommitDate = commitsData[0].commit.author.date;
 
                     if (cachedCommitDate !== latestCommitDate) {
-                        console.log("YEEEYYY New Mediassss");
+                        console.log(
+                            "%c Get Cached Media ",
+                            "background: purple; color: white; font-size: 15px; font-weight: bold;",
+                            "YEEEYYY New Mediassss"
+                        );
                         cachedMedia = await fetchAndCacheMedia(category);
                     } else {
                         console.log(
+                            "%c Get Cached Media ",
+                            "background: purple; color: white; font-size: 15px; font-weight: bold;",
                             `Category: ${category}\ncachedCommitDate: ${cachedCommitDate}\nlatestCommitDate: ${latestCommitDate}`
                         );
                         cachedMedia = JSON.parse(cachedMedia);
@@ -589,7 +673,11 @@ document.addEventListener("DOMContentLoaded", async function () {
         let cachedMedia = localStorage.getItem("cached_" + category);
 
         if (!cachedMedia) {
-            console.log(`${category} is caching...`);
+            console.log(
+                "%c Get Cached Media ",
+                "background: purple; color: white; font-size: 15px; font-weight: bold;",
+                `${category} is caching...`
+            );
             cachedMedia = await fetchAndCacheMedia(category);
         } else {
             const cachedCommitDate = localStorage.getItem(
@@ -600,19 +688,31 @@ document.addEventListener("DOMContentLoaded", async function () {
 
             if (commitsResponse.status === 403) {
                 console.log(
+                    "%c Get Cached Media ",
+                    "background: purple; color: white; font-size: 15px; font-weight: bold;",
                     `You Forbidden Github Api\nReason: github rate limit activated please try again after 1 hour\nResponse:`
                 );
-                console.log(commitsResponse);
+                console.log(
+                    "%c Get Cached Media ",
+                    "background: purple; color: white; font-size: 15px; font-weight: bold;",
+                    commitsResponse
+                );
                 cachedMedia = JSON.parse(cachedMedia);
             } else {
                 const commitsData = await commitsResponse.json();
                 const latestCommitDate = commitsData[0].commit.author.date;
 
                 if (cachedCommitDate !== latestCommitDate) {
-                    console.log("YEEEYYY New Mediassss");
+                    console.log(
+                        "%c Get Cached Media ",
+                        "background: purple; color: white; font-size: 15px; font-weight: bold;",
+                        "YEEEYYY New Mediassss"
+                    );
                     cachedMedia = await fetchAndCacheMedia(category);
                 } else {
                     console.log(
+                        "%c Get Cached Media ",
+                        "background: purple; color: white; font-size: 15px; font-weight: bold;",
                         `Category: ${category}\ncachedCommitDate: ${cachedCommitDate}\nlatestCommitDate: ${latestCommitDate}`
                     );
                     cachedMedia = JSON.parse(cachedMedia);
@@ -645,6 +745,11 @@ ambianceToggleSwitch.addEventListener("change", function () {
                 mediaContainer.style.boxShadow = "0 0 20px rgb(255, 255, 255)";
             });
         localStorage.setItem("ambianceMode", "true");
+        console.log(
+            "%c Settings ",
+            "background: blue; color: white; font-size: 15px; font-weight: bold;",
+            "Ambiance Mode: True"
+        );
     } else {
         document
             .querySelectorAll(".media-container")
@@ -652,20 +757,46 @@ ambianceToggleSwitch.addEventListener("change", function () {
                 mediaContainer.style.boxShadow = "0 0 20px rgb(0, 0, 0)";
             });
         localStorage.setItem("ambianceMode", "false");
+        console.log(
+            "%c Settings ",
+            "background: blue; color: white; font-size: 15px; font-weight: bold;",
+            "Ambiance Mode: False"
+        );
     }
 });
 
 changeTitleInput.addEventListener("input", function () {
     desc1.textContent = changeTitleInput.value;
     localStorage.setItem("title", desc1.textContent);
+    /* console.log(
+        "%c Settings ",
+        "background: blue; color: white; font-size: 15px; font-weight: bold;",
+        `New Title: ${desc1.textContent}`
+    );*/
 });
 resetTitleButton.addEventListener("click", function () {
     desc1.textContent = "ε(´｡•᎑•`)っ 💕";
     localStorage.setItem("title", desc1.textContent);
+    document.getElementById("newTitle").value = desc1.textContent;
+    console.log(
+        "%c Settings ",
+        "background: blue; color: white; font-size: 15px; font-weight: bold;",
+        `Title resetted`
+    );
 });
 
 settingsButton.addEventListener("click", function () {
     settingsModal.style.display = "block";
+    localtitle = localStorage.getItem("title");
+    if (localtitle) {
+        if (localtitle.trim() === "") {
+            desc1.textContent = "ε(´｡•᎑•`)っ 💕";
+            localStorage.setItem("title", desc1.textContent);
+            document.getElementById("newTitle").value = desc1.textContent;
+        } else {
+            document.getElementById("newTitle").value = localtitle;
+        }
+    }
 });
 
 function closeModal() {
@@ -692,6 +823,11 @@ function checktitle() {
             localStorage.setItem("title", desc1.textContent);
         } else {
             desc1.textContent = title;
+            console.log(
+                "%c Settings ",
+                "background: darkblue; color: white; font-size: 15px; font-weight: bold;",
+                `Title: ${title}`
+            );
         }
     }
 }
@@ -722,7 +858,11 @@ function konamiCodeCheck(event) {
         if (konamiCodePosition === konamiCode.length) {
             document.getElementById("desc1").innerHTML =
                 "You Found The Secret! , again , Congratulations!";
-            console.log("Easter Egg activated!");
+            console.log(
+                "%c Easter Egg ",
+                "background: yellow; color: white; font-size: 15px; font-weight: bold;",
+                "ε(´｡•᎑•`)っ ❤️"
+            );
             setTimeout(() => {
                 window.location.href = "/fuksci.html";
             }, 2500);
@@ -762,7 +902,11 @@ function hmmnewcategory(event) {
         newcategorykeyposition++;
 
         if (newcategorykeyposition === newcategorykeys.length) {
-            console.log("Hmm new category... interesting");
+            console.log(
+                "%c Adding Category ",
+                "background: purple; color: white; font-size: 15px; font-weight: bold;",
+                "Hmm new category... interesting"
+            );
             localStorage.setItem("newCategorys", true);
             const categorySelect = document.getElementById("categorySelect");
             const tiktokOption = categorySelect.querySelector(
@@ -776,7 +920,11 @@ function hmmnewcategory(event) {
                 newOption.value = "tiktok";
                 newOption.textContent = "💃 tiktok 💃";
                 categorySelect.appendChild(newOption);
-                console.log("tiktok category added!");
+                console.log(
+                    "%c Adding Category ",
+                    "background: purple; color: white; font-size: 15px; font-weight: bold;",
+                    "tiktok category added!"
+                );
             }
 
             if (!instagramOption) {
@@ -784,7 +932,11 @@ function hmmnewcategory(event) {
                 newOption.value = "instagram";
                 newOption.textContent = "🔴 instagram 🟡";
                 categorySelect.appendChild(newOption);
-                console.log("instagram category added!");
+                console.log(
+                    "%c Adding Category ",
+                    "background: purple; color: white; font-size: 15px; font-weight: bold;",
+                    "instagram category added!"
+                );
             }
             newcategorykeyposition = 0;
         }
@@ -805,14 +957,22 @@ if (newCategorys !== null && newCategorys === "true") {
         newOption.value = "tiktok";
         newOption.textContent = "💃 tiktok 💃";
         categorySelect.appendChild(newOption);
-        console.log("tiktok category added!");
+        console.log(
+            "%c Adding Category ",
+            "background: purple; color: white; font-size: 15px; font-weight: bold;",
+            "tiktok category added!"
+        );
     }
     if (!instagramOption) {
         const newOption = document.createElement("option");
         newOption.value = "instagram";
         newOption.textContent = "🔴 instagram 🟡";
         categorySelect.appendChild(newOption);
-        console.log("instagram category added!");
+        console.log(
+            "%c Adding Category ",
+            "background: purple; color: white; font-size: 15px; font-weight: bold;",
+            "instagram category added!"
+        );
     }
 }
 

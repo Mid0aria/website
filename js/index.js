@@ -1,4 +1,11 @@
 //made with love .
+/*
+==========================
+
+	EasterEgg
+
+==========================
+*/
 const konamiCode = [
     "ArrowUp",
     "ArrowUp",
@@ -31,13 +38,51 @@ function activateEasterEgg() {
     document.getElementById("desc1").innerHTML = "You Found";
     document.getElementById("desc2").innerHTML = "The Secret!";
     document.getElementById("desc3").innerHTML = "Congratulations!";
-    console.log("ε(´｡•᎑•`)っ 💕");
+
+    console.log(
+        "%c Easter Egg ",
+        "background: yellow; color: white; font-size: 15px; font-weight: bold;",
+        "ε(´｡•_•`)っ 💔"
+    );
     setTimeout(() => {
         window.location.href = "/galery.html";
     }, 2500);
 }
 
 document.addEventListener("keydown", konamiCodeCheck);
+
+/*
+==========================
+
+	ReloadLanyard
+
+==========================
+*/
+
+function reloadlanyard() {
+    var lanyardelement = document.getElementById("lanyard");
+    var lanyarddatee = new Date().getTime();
+    console.log(
+        "%c Lanyard ",
+        "background: purple; color: white; font-size: 15px; font-weight: bold;",
+        `Reloading Lanyard`
+    );
+
+    lanyardelement.innerHTML =
+        '<img src="https://lanyard.cnrad.dev/api/526822284694913042?theme=dark&borderRadius=30px&showDisplayName=true&idleMessage=Sanır%20isem%203%20santim&' +
+        lanyarddatee +
+        '" />';
+}
+
+setInterval(reloadlanyard, 15000);
+
+/*
+==========================
+
+	Song of The Day
+
+==========================
+*/
 
 async function fetchSongs() {
     const response = await fetch("./assets/songs.json");
@@ -64,6 +109,8 @@ async function updateSongOfTheDay() {
         localStorage.setItem("day", currentDay);
         localStorage.setItem("changeSong", "true");
         console.log(
+            "%c Song Of The Day ",
+            "background: purple; color: white; font-size: 15px; font-weight: bold;",
             "Day:" +
                 localStorage.getItem("day") +
                 "\nchangeSong: " +
@@ -78,6 +125,8 @@ async function updateSongOfTheDay() {
         localStorage.setItem("previousSong", selectedSong);
         localStorage.setItem("changeSong", "false");
         console.log(
+            "%c Song Of The Day ",
+            "background: purple; color: white; font-size: 15px; font-weight: bold;",
             "Day:" +
                 localStorage.getItem("day") +
                 "\nchangeSong: " +
@@ -99,21 +148,14 @@ async function updateSongOfTheDay() {
 
 window.addEventListener("load", updateSongOfTheDay);
 
-function switchVisible() {
-    if (document.getElementById("box")) {
-        if (document.getElementById("box").style.display == "none") {
-            document.getElementById("box").style.display = "block";
-            document.getElementById("dirbox").style.display = "none";
-        } else {
-            document.getElementById("box").style.display = "none";
-            document.getElementById("dirbox").style.display = "block";
-        }
-    }
-}
+/*
+==========================
 
-/**
- * requestAnimationFrame
- */
+	BlackHole
+
+==========================
+*/
+
 window.requestAnimationFrame = (function () {
     return (
         window.requestAnimationFrame ||

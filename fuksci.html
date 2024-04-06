@@ -126,7 +126,11 @@
             }
 
             function activateEasterEgg() {
-                console.log("ε(´｡•᎑•`)っ 💕");
+                console.log(
+                    "%c Easter Egg ",
+                    "background: yellow; color: white; font-size: 15px; font-weight: bold;",
+                    "ε(´｡•◡•`)っ 💕"
+                );
                 setTimeout(() => {
                     window.location.href = "/games/pingpong.html";
                 }, 1000);
