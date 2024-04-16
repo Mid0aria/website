@@ -69,7 +69,7 @@ function reloadlanyard() {
     );
 
     lanyardelement.innerHTML =
-        '<img src="https://lanyard.cnrad.dev/api/526822284694913042?theme=dark&borderRadius=30px&showDisplayName=true&idleMessage=Sanır%20isem%203%20santim&' +
+        '<img src="https://lanyard.cnrad.dev/api/526822284694913042?theme=dark&borderRadius=30px&showDisplayName=true&idleMessage=Come%20back%20to%20me,%20my%20little%20butterfly.&' +
         lanyarddatee +
         '" />';
 }
