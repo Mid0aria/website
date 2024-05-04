@@ -479,7 +479,7 @@ Particle.prototype = (function (o) {
 // Initialize
 (function () {
     // Configs
-    var BACKGROUND_COLOR = "rgba(54, 57, 63, 1)",
+    var BACKGROUND_COLOR = "rgba(0,0,0)",
         PARTICLE_RADIUS = 1,
         G_POINT_RADIUS = 10,
         G_POINT_RADIUS_LIMITS = 65;
@@ -598,7 +598,7 @@ Particle.prototype = (function (o) {
 
     // GUI Control
     control = {
-        particleNum: 1000,
+        particleNum: 500,
     };
 
     // Init
@@ -643,7 +643,7 @@ Particle.prototype = (function (o) {
         bufferCtx.restore();
         len = particles.length;
         bufferCtx.save();
-        bufferCtx.fillStyle = bufferCtx.strokeStyle = "#00ff00";
+        bufferCtx.fillStyle = bufferCtx.strokeStyle = "#A020F0";
         bufferCtx.lineCap = bufferCtx.lineJoin = "circle";
         bufferCtx.lineWidth = PARTICLE_RADIUS * 3;
         bufferCtx.beginPath();
