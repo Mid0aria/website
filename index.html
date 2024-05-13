@@ -39,8 +39,10 @@
     </head>
 
     <body>
-        <canvas id="c"></canvas>
-        <script src="./js/index.js"></script>
+        <video id="background-video" autoplay loop muted>
+            <source src="assets/car.mp4" type="video/mp4" />
+        </video>
+
         <div class="boxcontainer unclickable">
             <div class="box unclickable" id="box" style="display: block">
                 <img class="blob" src="./assets/foti.jpg" />
@@ -214,6 +216,7 @@
                 <!-- <div id="songOfTheDay"><h2 style="color: wheat">Song Of The Day</h2><div align="center"class="clickable"id="spotifyEmbed"></div></div>  -->
             </div>
         </div>
+        <script src="./js/index.js"></script>
         <script>
             reloadlanyard();
         </script>
